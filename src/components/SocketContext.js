@@ -5,7 +5,7 @@ import { io } from 'socket.io-client';
 export const SocketContext = createContext();
 
 // Create socket instance
-const socket = io('http://localhost:5000', {
+const socket = io('https://reem-team-front-final.vercel.app/', {
   transports: ['websocket', 'polling'],
   reconnection: true,
   reconnectionAttempts: 5,
