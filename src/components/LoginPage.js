@@ -52,6 +52,13 @@ const LoginPage = ({ handleLogin, onClose }) => {
       }
   
       if (response.success && response.user) {
+        // Store token and userId in localStorage
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+        }
+        if (response.user && response.user._id) {
+          localStorage.setItem('userId', response.user._id);
+        }
         setUser(response.user);
         handleLogin(username, password);
         closeModal();
