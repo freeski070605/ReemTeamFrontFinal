@@ -181,7 +181,7 @@ const GameBoard = ({ user }) => {
                     return;
                 }
         
-                const response = await axios.post('http://localhost:3000/games', {
+                const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/games`, {
                     player1: currentUser.username,
                     player2: players.length > 1 ? players[1].username : 'AI',
                     date: new Date(),
@@ -637,7 +637,7 @@ const handleChipsUpdate = async (winnerIndex, multiplier = 1) => {
 
     try {
         // Adjust your endpoint URL according to your server's API
-        const endpoint = `http://localhost:3000/users/${username}/updateChips`;
+        const endpoint = `${process.env.REACT_APP_API_BASE_URL}/users/${username}/updateChips`;
 
         // Make the PUT request
         await axios.put(endpoint, {

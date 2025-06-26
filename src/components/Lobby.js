@@ -25,7 +25,7 @@ const Lobby = () => {
 
   const fetchTables = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:5000/tables');
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/tables`);
       const data = await response.json();
       setTables(data.tables || []);
     } catch (error) {
@@ -36,7 +36,7 @@ const Lobby = () => {
   const createTable = async (tableData) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/tables', {
+      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/tables`, {
         ...tableData,
         player: user
       }, {

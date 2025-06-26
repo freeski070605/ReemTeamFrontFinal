@@ -10,7 +10,7 @@ class ChipSystem {
     static async getChipBalance(username) {
     try {
         const response = await axios.get(
-            `http://localhost:5000/users/${username}/balance`,
+            `${process.env.REACT_APP_API_BASE_URL}/users/${username}/balance`,
             { 
                 headers: { 
                     Authorization: `Bearer ${localStorage.getItem('token')}` 
@@ -44,7 +44,7 @@ class ChipSystem {
             const newBalance = currentBalance + amount;
 
             const response = await axios.put(
-                `http://localhost:5000/users/${username}/updateChips`,
+                `${process.env.REACT_APP_API_BASE_URL}/users/${username}/updateChips`,
                 { 
                     chips: newBalance,
                     gameId,
@@ -220,7 +220,7 @@ static startNewGame(gameState) {
                 const earnings = isWinner ? (winType === 'REEM' ? stake * 2 : stake) : -stake;
     
                 // Update user stats
-                await axios.post(`http://localhost:5000/users/${player.username}/updateStats`, {
+                await axios.post(`${process.env.REACT_APP_API_BASE_URL}/users/${player.username}/updateStats`, {
                     gameResult: isWinner ? (winType === 'REEM' ? 'reem' : 'win') : 'loss',
                     stake: stake,
                     earnings: earnings,

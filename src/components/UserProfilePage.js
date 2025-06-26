@@ -43,7 +43,7 @@ const UserProfilePage = () => {
     if (!user?.username) return;
     
     try {
-      const response = await axios.get(`http://localhost:5000/users/${user.username}/history`);
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/users/${user.username}/history`);
       setGameHistory(response.data.history);
     } catch (error) {
       console.error('Error fetching game history:', error);
@@ -54,7 +54,7 @@ const UserProfilePage = () => {
     if (!user?.username) return;
 
     try {
-      const response = await axios.get(`http://localhost:5000/users/${user.username}/stats`);
+      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/users/${user.username}/stats`);
       setStats(response.data.stats);
     } catch (error) {
       console.error('Error fetching user stats:', error);
@@ -78,7 +78,7 @@ const UserProfilePage = () => {
   const handleBuyChips = async (amount) => {
     setLoading(true);
     try {
-      const response = await axios.put(`http://localhost:5000/users/${user.username}/updateChips`, {
+      const response = await axios.put(`${process.env.REACT_APP_API_BASE_URL}/users/${user.username}/updateChips`, {
         chips: user.chips + amount
       });
       updateUserChips(response.data.chips);

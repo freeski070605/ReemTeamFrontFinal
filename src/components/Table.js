@@ -70,7 +70,7 @@ const TableComponent = () => {
       // Fetch latest table state to update players list
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/tables/${tableId}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/tables/${tableId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -134,7 +134,7 @@ const TableComponent = () => {
       // Fetch latest table state to update players list
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/tables/${tableId}`, {
+        const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/tables/${tableId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -186,7 +186,7 @@ const TableComponent = () => {
     (async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/tables/${tableId}`, {
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/tables/${tableId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'

@@ -17,7 +17,8 @@ export const SocketProvider = ({ children }) => {
       return;
     }
 
-    const newSocket = io('https://reem-team-front-final.vercel.app', {
+    const socketUrl = process.env.REACT_APP_SOCKET_URL || 'https://reem-team-front-final.vercel.app';
+    const newSocket = io(socketUrl, {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 5,
