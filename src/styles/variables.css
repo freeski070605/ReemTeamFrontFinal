@@ -1,0 +1,64 @@
+/* variables.css - Responsive Design with rem units */
+
+:root {
+    /* Colors */
+    --color-primary: #ffd700; /* Gold */
+    --color-secondary: #4a90e2; /* Blue */
+    --color-tertiary: #2ecc71; /* Green */
+    --color-danger: #e74c3c; /* Red */
+    --color-background-dark: #1a1a1a;
+    --color-background-medium: #2d2d2d;
+    --color-background-light: #3a3a3a;
+    --color-text-light: #ffffff;
+    --color-text-medium: #b0b0b0;
+    --color-text-dark: #666;
+    --color-border-light: rgba(255, 215, 0, 0.1);
+    --color-border-medium: rgba(255, 215, 0, 0.5);
+    --color-shadow-dark: rgba(0, 0, 0, 0.6);
+    --color-shadow-medium: rgba(0, 0, 0, 0.3);
+    --color-shadow-light: rgba(0, 0, 0, 0.2);
+
+    /* Gradients */
+    --gradient-dark-to-medium: linear-gradient(135deg, var(--color-background-dark), var(--color-background-medium));
+    --gradient-medium-to-dark: linear-gradient(145deg, var(--color-background-medium), var(--color-background-dark));
+    --gradient-green-table: linear-gradient(145deg, #1d5411, #124305);
+    --gradient-blue-green: linear-gradient(90deg, #4a90e2, #2ecc71);
+    --gradient-green-button: linear-gradient(135deg, #2ecc71, #27ae60);
+    --gradient-red-button: linear-gradient(to right, #d32f2f, #b71c1c);
+    --gradient-spectator-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    --gradient-waiting-status: linear-gradient(135deg, #4CAF50, #45a049);
+
+    /* Spacing - using rem units */
+    --spacing-xxs: 0.25rem;
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.25rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-xxl: 3rem;
+    --spacing-xxxl: 3.5rem; /* For larger padding in overlays */
+
+    /* Border Radius - using rem units */
+    --border-radius-sm: 0.5rem;
+    --border-radius-md: 1rem;
+    --border-radius-lg: 1.5rem;
+    --border-radius-xl: 2rem;
+    --border-radius-xxl: 2.5rem;
+    --border-radius-circle: 50%;
+
+    /* Font Sizes - using rem units */
+    --font-size-xs: 0.8rem;
+    --font-size-sm: 1rem;
+    --font-size-md: 1.2rem;
+    --font-size-lg: 1.4rem;
+    --font-size-xl: 1.6rem;
+    --font-size-xxl: 1.8rem;
+    --font-size-xxxl: 2rem;
+    --font-size-xxxxl: 2.5rem;
+    --font-size-xxxxxl: 3rem;
+
+
+    /* Z-index */
+    --z-index-overlay: 1000;
+    --z-index-message: 1000;
+}

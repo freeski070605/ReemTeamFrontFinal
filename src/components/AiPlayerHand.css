@@ -1,0 +1,32 @@
+/* PlayerHand.css */
+.player-hand-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.card {
+    cursor: pointer;
+}
+
+.card img {
+    width: 100px; /* Adjust size as needed */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.spreads {
+    display: flex;
+    gap: 10px; /* Adjust gap between cards */
+}
+
+.spread {
+    display: flex;
+    gap: 5px; /* Adjust gap between cards in the spread */
+}
+
+
+.small {
+    width: 80px; /* Adjust smaller size */
+    height: auto; /* Maintain aspect ratio */
+}
+

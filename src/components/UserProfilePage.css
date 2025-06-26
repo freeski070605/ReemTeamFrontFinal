@@ -1,0 +1,345 @@
+/* UserProfilePage.css - Professional and Modern Design */
+
+:root {
+    --primary-color: #4A90E2; /* A vibrant blue */
+    --secondary-color: #50E3C2; /* A complementary teal */
+    --dark-background: #2C3E50; /* Dark blue-grey for backgrounds */
+    --light-text: #ECF0F1; /* Light grey for text on dark backgrounds */
+    --dark-text: #34495E; /* Dark blue-grey for text on light backgrounds */
+    --card-background: #FFFFFF; /* White for cards/sections */
+    --border-color: #BDC3C7; /* Light grey for borders */
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --shadow-medium: rgba(0, 0, 0, 0.2);
+    --button-hover: #357ABD;
+    --success-color: #28A745;
+    --error-color: #DC3545;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--dark-background);
+    color: var(--dark-text);
+}
+
+.profile-container {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    color: var(--dark-text); /* Default text color for content */
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 15px;
+    color: var(--light-text);
+    box-shadow: 0 8px 16px var(--shadow-medium);
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+    transform: rotate(45deg);
+    opacity: 0.3;
+}
+
+.profile-header h1 {
+    font-size: 36px;
+    margin: 0;
+    font-weight: 700;
+    text-shadow: 1px 1px 3px var(--shadow-medium);
+}
+
+.chips-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 24px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50px;
+    font-weight: 600;
+    box-shadow: 0 2px 5px var(--shadow-light);
+}
+
+.chip-icon {
+    font-size: 28px; /* Adjust as needed for CasinoChip component */
+    color: gold; /* Example color for chip icon */
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.stats-card, .chips-card, .recent-games, .quick-actions {
+    background: var(--card-background);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 6px 12px var(--shadow-light);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stats-card:hover, .chips-card:hover, .recent-games:hover, .quick-actions:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px var(--shadow-medium);
+}
+
+h2 {
+    font-size: 28px;
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 25px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 20px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 20px;
+    background: #F8F9FA;
+    border-radius: 10px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.stat-item h3 {
+    font-size: 18px;
+    color: var(--dark-text);
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.stat-item p {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.chips-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.chip-buy-button {
+    padding: 15px 20px;
+    border: none;
+    border-radius: 10px;
+    background: var(--success-color);
+    color: var(--light-text);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 3px 6px var(--shadow-light);
+}
+
+.chip-buy-button:hover {
+    background-color: #218838;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px var(--shadow-medium);
+}
+
+.chip-buy-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.games-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.game-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #F8F9FA;
+    border-radius: 10px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.game-result {
+    font-weight: 600;
+    color: var(--dark-text);
+}
+
+.game-result.win {
+    color: var(--success-color);
+}
+
+.game-result.loss {
+    color: var(--error-color);
+}
+
+.game-stake {
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.game-date {
+    font-size: 14px;
+    color: #6C757D;
+}
+
+.quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.action-button {
+    padding: 15px 25px;
+    border: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 8px var(--shadow-light);
+}
+
+.action-button.primary {
+    background: var(--primary-color);
+    color: var(--light-text);
+}
+
+.action-button.primary:hover {
+    background-color: var(--button-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px var(--shadow-medium);
+}
+
+.action-button.secondary {
+    background: #6C757D; /* Grey for secondary actions */
+    color: var(--light-text);
+}
+
+.action-button.secondary:hover {
+    background-color: #5A6268;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px var(--shadow-medium);
+}
+
+.feedback {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 500;
+    background: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #bbdefb;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+        padding: 20px;
+    }
+
+    .profile-header h1 {
+        font-size: 30px;
+    }
+
+    .chips-display {
+        font-size: 20px;
+        padding: 8px 15px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chips-options {
+        grid-template-columns: 1fr;
+    }
+
+    .action-button {
+        font-size: 16px;
+        padding: 12px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-container {
+        padding: 20px 10px;
+    }
+
+    .profile-header h1 {
+        font-size: 24px;
+    }
+
+    .chips-display {
+        font-size: 18px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    .stat-item h3 {
+        font-size: 16px;
+    }
+
+    .stat-item p {
+        font-size: 24px;
+    }
+
+    .chip-buy-button {
+        font-size: 14px;
+        padding: 12px 15px;
+    }
+
+    .game-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}
