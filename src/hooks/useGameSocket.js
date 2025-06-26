@@ -8,7 +8,7 @@ let socketInstance = null;
 
 const getSocket = () => {
   if (!socketInstance) {
-    socketInstance = io('http://localhost:5000', {
+    socketInstance = io('https://reem-team-front-final.vercel.app/', {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 10,
