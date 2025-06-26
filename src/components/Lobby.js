@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from './Header';
 import { UserContext } from './UserContext';
-import { socket } from '../hooks/useGameSocket';
+import { SocketContext } from './SocketContext';
 import './Lobby.css';
 import CreateTableModal from './createTableModal';
 
@@ -16,6 +16,7 @@ const Lobby = () => {
   const [queueStatus, setQueueStatus] = useState({});
   const [isJoiningQueue, setIsJoiningQueue] = useState(false);
   const { user, isLoading } = useContext(UserContext);
+  const { socket } = useContext(SocketContext);
   const navigate = useNavigate();
 
   // Filter tables by stake OR if user is seated
