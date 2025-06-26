@@ -5,7 +5,8 @@ import SpectatorMode from './SpectatorMode';
 import { UserContext } from './UserContext';
 import ChipSystem from '../utils/ChipSystem';
 import { GameErrorBoundary } from './GameErrorBoundary';
-import { useSocketConnection, useGameSocket, socket } from '../hooks/useGameSocket';
+import { SocketContext } from '../components/SocketContext';
+import { useSocketConnection, useGameSocket } from '../hooks/useGameSocket';
 import './Table.css';
 import AuthService from './AuthService';
 export const GameContext = createContext();
@@ -22,7 +23,7 @@ const TableComponent = () => {
   const [transitionStatus, setTransitionStatus] = useState(null);
   const [autoStartCountdown, setAutoStartCountdown] = useState(null);
   const hasJoinedRef = useRef(false);
-
+  const { socket } = useContext(SocketContext); // ✅ context-based socket
   const [gameState, setGameState] = useState({
     players: [],
     stake: 0,
