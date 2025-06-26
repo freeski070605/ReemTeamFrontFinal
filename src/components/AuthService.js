@@ -11,6 +11,7 @@ const AuthService = {
         { username, password },
         { withCredentials: true }
       );
+      console.log('LOGIN RESPONSE', response.data);
       if (response.data.success && response.data.user) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('userId', response.data.user._id);
