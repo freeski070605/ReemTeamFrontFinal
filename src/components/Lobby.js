@@ -16,7 +16,7 @@ const Lobby = () => {
   const [queueStatus, setQueueStatus] = useState({});
   const [isJoiningQueue, setIsJoiningQueue] = useState(false);
   const { user, isLoading } = useContext(UserContext);
-  const { socket, isConnected } = useContext(SocketContext);
+  const { socket } = useContext(SocketContext);
   const navigate = useNavigate();
 
   // Filter tables by stake OR if user is seated
@@ -70,17 +70,15 @@ const Lobby = () => {
         return;
       }
 
-      if (socket) {
-        socket.emit('join_queue', {
-          stake: stakeToJoin,
-          tableId: tableId,
-          player: {
-            username: user.username,
-            chips: user.chips,
-            isHuman: true
-          }
-        });
-      }
+      socket.emit('join_queue', {
+        stake: stakeToJoin,
+        tableId: tableId,
+        player: {
+          username: user.username,
+          chips: user.chips,
+          isHuman: true
+        }
+      });
 
       console.log(`Joining queue for stake: $${stakeToJoin}, tableId: ${tableId}`);
     } catch (error) {
@@ -93,12 +91,10 @@ const Lobby = () => {
   const leaveQueue = useCallback((stakeToLeave) => {
     if (!user) return;
 
-    if (socket) {
-      socket.emit('leave_queue', {
-        stake: stakeToLeave,
-        username: user.username
-      });
-    }
+    socket.emit('leave_queue', {
+      stake: stakeToLeave,
+      username: user.username
+    });
 
     setQueueStatus(prev => {
       const newStatus = { ...prev };
@@ -166,15 +162,13 @@ const Lobby = () => {
     };
 
     // Register socket listeners
-    if (socket) {
-      socket.on('tables_update', handleTablesUpdate);
-      socket.on('table_assigned', handleTableAssigned);
-      socket.on('queue_status', handleQueueStatus);
-      socket.on('leave_table_result', handleLeaveTableResult);
-      socket.on('error', handleError);
-      // --- NEW: Listen for spectator_mode_active in the lobby ---
-      socket.on('spectator_mode_active', handleSpectatorModeActive);
-    }
+    socket.on('tables_update', handleTablesUpdate);
+    socket.on('table_assigned', handleTableAssigned);
+    socket.on('queue_status', handleQueueStatus);
+    socket.on('leave_table_result', handleLeaveTableResult);
+    socket.on('error', handleError);
+    // --- NEW: Listen for spectator_mode_active in the lobby ---
+    socket.on('spectator_mode_active', handleSpectatorModeActive);
 
     // Refresh tables when tab becomes visible
     document.addEventListener('visibilitychange', () => {
@@ -182,15 +176,13 @@ const Lobby = () => {
     });
 
     return () => {
-      if (socket) {
-        socket.off('tables_update', handleTablesUpdate);
-        socket.off('table_assigned', handleTableAssigned);
-        socket.off('queue_status', handleQueueStatus);
-        socket.off('leave_table_result', handleLeaveTableResult);
-        socket.off('error', handleError);
-        // --- NEW: Unregister spectator_mode_active handler ---
-        socket.off('spectator_mode_active', handleSpectatorModeActive);
-      }
+      socket.off('tables_update', handleTablesUpdate);
+      socket.off('table_assigned', handleTableAssigned);
+      socket.off('queue_status', handleQueueStatus);
+      socket.off('leave_table_result', handleLeaveTableResult);
+      socket.off('error', handleError);
+      // --- NEW: Unregister spectator_mode_active handler ---
+      socket.off('spectator_mode_active', handleSpectatorModeActive);
       document.removeEventListener('visibilitychange', fetchTables);
     };
   }, [navigate, fetchTables]);
@@ -338,8 +330,8 @@ const Lobby = () => {
 
       {/* Connection Status */}
       <div className="connection-indicator">
-        <span className={`status ${isConnected ? 'connected' : 'disconnected'}`}>
-          {isConnected ? '🟢 Connected' : '🔴 Disconnected'}
+        <span className={`status ${socket && socket.connected ? 'connected' : 'disconnected'}`}>
+          {socket && socket.connected ? '🟢 Connected' : '🔴 Disconnected'}
         </span>
       </div>
     </div>
@@ -347,3 +339,4 @@ const Lobby = () => {
 };
 
 export default Lobby;
+
