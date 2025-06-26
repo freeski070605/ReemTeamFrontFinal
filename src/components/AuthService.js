@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { redirect } from 'react-router-dom';
 
-const API_URL = 'http://localhost:5000'; // Replace with your backend URL
+const API_URL = 'https://reemteamserver.onrender.com'; // Replace with your backend URL
 
 const AuthService = {
   login: async (username, password) => {
