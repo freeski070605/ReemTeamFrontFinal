@@ -13,6 +13,7 @@ const AuthService = {
       );
       if (response.data.success && response.data.user) {
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('userId', response.data.user._id);
         return {
           success: true,
           user: response.data.user
