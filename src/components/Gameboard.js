@@ -1,6 +1,7 @@
 import React, { useMemo, useEffect, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { SocketContext } from '../components/SocketContext';
 import { useGameSocket } from '../hooks/useGameSocket';
 import useGameState from '../hooks/useGameState';
 import { PLAYER_POSITIONS, CARD_VALUES } from './gameConstants';
@@ -20,12 +21,14 @@ import ChipSystem from '../utils/ChipSystem';
 
 
 
-const GameBoard = ({ tableId, gameState, setGameState, socket, user }) => {
+const GameBoard = ({ tableId, gameState, setGameState, user }) => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [isInitialized, setIsInitialized] = useState(false);
     const [selectedCard, setSelectedCard] = useState(null);
     const [hitMode, setHitMode] = useState(false);
+    const { socket } = useContext(SocketContext); // ✅ context-based socket
+
   
   // ✅ Use useMemo for isSpectator to react to gameState.players and user changes
   const isSpectator = useMemo(() => {
