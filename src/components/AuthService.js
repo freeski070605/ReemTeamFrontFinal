@@ -27,7 +27,7 @@ const AuthService = {
   login: async (username, password) => {
     try {
       const response = await axiosInstance.post(
-        `/users/login`,
+        `${API_URL}/users/login`,
         { username, password }
       );
       console.log('LOGIN RESPONSE', response.data);
@@ -50,7 +50,7 @@ const AuthService = {
 
   logout: async () => {
     try {
-      await axiosInstance.post(`/users/logout`);
+      await axiosInstance.post(`$${API_URL}/users/logout`);
       console.log('Logout successful');
       redirect('/');
     } catch (error) {
@@ -63,7 +63,7 @@ const AuthService = {
     try {
       console.log('Registration request:', { username, email, password });
 
-      const response = await axiosInstance.post(`/users/register`, { username, email, password });
+      const response = await axiosInstance.post(`${API_URL}/users/register`, { username, email, password });
       console.log('Registration response:', response.data);
 
       if (response.data.success) {
@@ -80,7 +80,7 @@ const AuthService = {
 
  getCurrentUser: async () => {
   try {
-    const response = await axiosInstance.get(`/users/profile`);
+    const response = await axiosInstance.get( `${API_URL}/users/profile` );
     console.log('Get current user response:', response.data);
     if (response.data && response.data.success) { // Ensure success is true
       return { success: true, user: response.data.user };
@@ -99,7 +99,7 @@ const AuthService = {
   leaveTable: async (tableId, username) => {
     try {
       const response = await axiosInstance.post(
-        `/tables/${tableId}/leave`, // ✅ fix the URL to match route
+        `${API_URL}/tables/${tableId}/leave`, // ✅ fix the URL to match route
         { username }
       );
       console.log('Leave table response:', response.data);
