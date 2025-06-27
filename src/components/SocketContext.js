@@ -1,19 +1,32 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import { io } from 'socket.io-client';
+import { UserContext } from './UserContext'; // Import UserContext
 
 export const SocketContext = createContext();
 
 export const SocketProvider = ({ children }) => {
+  const { user } = useContext(UserContext); // Get user from UserContext
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [lastPing, setLastPing] = useState(null);
 
   useEffect(() => {
-    const userId = localStorage.getItem('userId');
-    const token = localStorage.getItem('token');
+    // Only attempt to connect if user data is available
+    if (!user || !user._id) {
+      console.warn('User not authenticated, skipping socket connection.');
+      if (socket) {
+        socket.disconnect(); // Disconnect existing socket if user logs out
+        setSocket(null);
+        setIsConnected(false);
+      }
+      return;
+    }
 
-    if (!userId || !token) {
-      console.warn('Missing userId or token in localStorage');
+    const userId = user._id; // Get userId from the user object
+    const token = localStorage.getItem('token'); // Token is still stored in localStorage
+
+    if (!token) {
+      console.warn('Missing token in localStorage, skipping socket connection.');
       return;
     }
     
@@ -51,7 +64,7 @@ export const SocketProvider = ({ children }) => {
       newSocket.disconnect();
       clearInterval(heartbeat);
     };
-  }, []);
+  }, [user]); // Re-run effect when the 'user' object changes
 
   return (
     <SocketContext.Provider value={{ socket, isConnected, lastPing }}>
