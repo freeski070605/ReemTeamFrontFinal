@@ -1,12 +1,29 @@
 import React from 'react';
 import './PlayerHand.css';
-const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selectedCard, isHidden }) => {
 
+const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selectedCard, isHidden }) => {
     if (!Array.isArray(cards)) return null;
 
     const suitOrder = ['clubs', 'diamonds', 'hearts', 'spades'];
     const rankOrder = ['ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-    
+
+    // Map card ranks to their actual filename prefixes to handle case sensitivity
+    const rankToFilenameMap = {
+        'ace': 'ace',
+        '2': '2',
+        '3': '3',
+        '4': '4',
+        '5': '5',
+        '6': '6',
+        '7': '7',
+        '8': '8',
+        '9': '9',
+        '10': '10',
+        'J': 'j', // Map 'J' to 'j' for filename consistency
+        'Q': 'Q',
+        'K': 'K',
+    };
+
     // Attach originalIndex and sort cards
     const sortedCards = cards
         .map((card, originalIndex) => ({ ...card, originalIndex }))
@@ -18,7 +35,7 @@ const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selec
 
     const handleCardInteraction = (originalIndex) => {
         if (!isActive || isHidden) return;
-        
+
         console.log('Card interaction:', {
             card: cards[originalIndex],
             originalIndex,
@@ -44,6 +61,7 @@ const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selec
                     const angle = start + (i * (spread / (total - 1 || 1)));
                     // Curve: cards further from center are slightly lower
                     const curve = Math.abs(angle) * 0.7; // px down for curve
+                    const filenameRank = rankToFilenameMap[card.rank] || card.rank; // Use mapped rank or original
                     return (
                       <div
                         key={`${card.rank}-${card.suit}-${card.originalIndex}`}
@@ -62,7 +80,7 @@ const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selec
                           src={
                             isHidden
                               ? `${process.env.PUBLIC_URL}/assets/cards/back.png`
-                              : `${process.env.PUBLIC_URL}/assets/cards/${card.rank}_of_${card.suit}.png`
+                              : `${process.env.PUBLIC_URL}/assets/cards/${filenameRank}_of_${card.suit}.png`
                           }
                           alt={isHidden ? 'Card Back' : `${card.rank} of ${card.suit}`}
                           className="card-image"
