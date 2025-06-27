@@ -18,12 +18,33 @@ export const SocketProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    // Add event listener for loginSuccess
+    window.addEventListener('loginSuccess', handleLoginSuccess);
+
+    // Clean up event listener on component unmount
+    return () => {
+      window.removeEventListener('loginSuccess', handleLoginSuccess);
+    };
+  }, [handleLoginSuccess]); // Dependency on memoized handler
+
+  useEffect(() => {
     
     if (!currentUserId || !currentToken) {
-      console.warn('Missing userId or token in localStorage');
+      console.warn('Missing userId or token in localStorage. Socket connection skipped.');
+      // Disconnect existing socket if credentials become invalid
+      if (socket) {
+        socket.disconnect();
+        setSocket(null);
+        setIsConnected(false);
+      }
       return;
     }
     
+    // Disconnect existing socket before creating a new one if dependencies change
+    if (socket) {
+      socket.disconnect();
+    }
+
     const socketUrl = process.env.REACT_APP_SOCKET_URL || 'https://reemteamserver.onrender.com';
     const newSocket = io(socketUrl, {
       transports: ['websocket', 'polling'],
@@ -54,16 +75,11 @@ export const SocketProvider = ({ children }) => {
       }
     }, 30000);
 
-    window.addEventListener('loginSuccess', handleLoginSuccess);
-
-
     return () => {
       newSocket.disconnect();
       clearInterval(heartbeat);
-      window.removeEventListener('loginSuccess', handleLoginSuccess);
-
     };
-  }, [currentUserId, currentToken, handleLoginSuccess]);
+  }, [currentUserId, currentToken]); // Dependencies for re-running the effect
 
   return (
     <SocketContext.Provider value={{ socket, isConnected, lastPing }}>
