@@ -51,7 +51,7 @@ export const SocketProvider = ({ children }) => {
       newSocket.disconnect();
       clearInterval(heartbeat);
     };
-  }, []);
+  }, [userId, token]);
 
   return (
     <SocketContext.Provider value={{ socket, isConnected, lastPing }}>
