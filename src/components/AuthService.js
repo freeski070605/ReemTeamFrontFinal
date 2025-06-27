@@ -77,19 +77,24 @@ const AuthService = {
     }
   },
 
-  getCurrentUser: async () => {
-    try {
-      const response = await axiosInstance.get(`/users/profile`);
-      console.log('Get current user response:', response.data);
-      if (response.data) {
-        return response.data;
-      }
-      return null;
-    } catch (error) {
-      console.error('Get current user error:', error);
-      return null;
+
+ getCurrentUser: async () => {
+  try {
+    const response = await axiosInstance.get(`/users/profile`);
+    console.log('Get current user response:', response.data);
+    if (response.data && response.data.success) { // Ensure success is true
+      return { success: true, user: response.data.user };
     }
-  },
+    // If response.data exists but success is false, or user is missing
+    return { success: false, error: response.data?.message || 'User data not found' };
+  } catch (error) {
+    console.error('Get current user error:', error);
+    // Return success: false on any error during the API call
+    return { success: false, error: error.message || 'Failed to fetch current user' };
+  }
+},
+
+
 
   leaveTable: async (tableId, username) => {
     try {
