@@ -6,7 +6,7 @@ export const useNetworkIntegration = () => {
         try {
             const token = localStorage.getItem('token');
             await axios.put(
-                `http://localhost:5000/users/${username}/updateChips`,
+                `${process.env.REACT_APP_API_BASE_URL}/users/${username}/updateChips`,
                 { chips: amount },
                 { headers: { Authorization: `Bearer ${token}` }}
             );
@@ -19,7 +19,7 @@ export const useNetworkIntegration = () => {
 
     const handleTableLeave = useCallback(async (tableId, username) => {
         try {
-            await axios.post(`http://localhost:5000/tables/${tableId}/leave`, {
+            await axios.post(`${process.env.REACT_APP_API_BASE_URL}/tables/${tableId}/leave`, {
                 username
             });
             return true;
