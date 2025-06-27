@@ -4,7 +4,6 @@ import AuthService from './AuthService';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from './UserContext';
 
-// Remove any duplicate Modal.setAppElement calls
 const LoginPage = ({ handleLogin, onClose }) => {
   const { setUser } = useContext(UserContext);
   const [username, setUsername] = useState('');
@@ -34,8 +33,6 @@ const LoginPage = ({ handleLogin, onClose }) => {
     }
   };
 
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
   
@@ -52,7 +49,7 @@ const LoginPage = ({ handleLogin, onClose }) => {
       }
   
       if (response.success && response.user) {
-        // Store token and userId in localStorage
+        // Ensure token and userId are always stored after successful authentication
         if (response.token) {
           localStorage.setItem('token', response.token);
         }
@@ -63,6 +60,9 @@ const LoginPage = ({ handleLogin, onClose }) => {
         handleLogin(username, password);
         closeModal();
         navigate('/userprofile');
+
+        // Dispatch custom event after successful login and token/userId storage
+        window.dispatchEvent(new Event('loginSuccess'));
       } else {
         setErrorMessage(response.error || 'Authentication failed');
       }
@@ -72,9 +72,7 @@ const LoginPage = ({ handleLogin, onClose }) => {
     }
   };
   
-
-
-
+  
   return (
     <Modal isOpen={modalIsOpen} onRequestClose={closeModal} shouldCloseOnOverlayClick={true}  appElement={document.getElementById('root')}>
       <h2>{isRegistering ? 'Register' : 'Login'}</h2>

@@ -10,6 +10,13 @@ export const SocketProvider = ({ children }) => {
   const [currentUserId, setCurrentUserId] = useState(localStorage.getItem('userId'));
   const [currentToken, setCurrentToken] = useState(localStorage.getItem('token'))
 
+  // Memoize the event handler to ensure stable reference for useEffect cleanup
+  const handleLoginSuccess = useCallback(() => {
+    console.log('loginSuccess event received in SocketContext. Updating user and token.');
+    setCurrentUserId(localStorage.getItem('userId'));
+    setCurrentToken(localStorage.getItem('token'));
+  }, []);
+
   useEffect(() => {
     
     if (!currentUserId || !currentToken) {
@@ -47,11 +54,16 @@ export const SocketProvider = ({ children }) => {
       }
     }, 30000);
 
+    window.addEventListener('loginSuccess', handleLoginSuccess);
+
+
     return () => {
       newSocket.disconnect();
       clearInterval(heartbeat);
+      window.removeEventListener('loginSuccess', handleLoginSuccess);
+
     };
-  }, [currentUserId, currentToken]);
+  }, [currentUserId, currentToken, handleLoginSuccess]);
 
   return (
     <SocketContext.Provider value={{ socket, isConnected, lastPing }}>
