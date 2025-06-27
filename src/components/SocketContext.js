@@ -12,7 +12,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     
-    if (!userId || !token) {
+    if (!currentUserId || !currentToken) {
       console.warn('Missing userId or token in localStorage');
       return;
     }
