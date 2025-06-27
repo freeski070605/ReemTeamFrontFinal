@@ -24,7 +24,7 @@ export const SocketProvider = ({ children }) => {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       timeout: 20000,
-      query: { userId, token }
+      query: { currentUserId, currentToken }
     });
 
     setSocket(newSocket);
