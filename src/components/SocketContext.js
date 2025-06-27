@@ -16,8 +16,8 @@ export const SocketProvider = ({ children }) => {
       console.warn('Missing userId or token in localStorage');
       return;
     }
-
-    const socketUrl = process.env.REACT_APP_SOCKET_URL || 'https://reem-team-front-final.vercel.app';
+    
+    const socketUrl = process.env.REACT_APP_SOCKET_URL || 'https://reemteamserver.onrender.com';
     const newSocket = io(socketUrl, {
       transports: ['websocket', 'polling'],
       reconnection: true,
