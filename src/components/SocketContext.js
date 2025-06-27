@@ -7,11 +7,11 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [lastPing, setLastPing] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(localStorage.getItem('userId'));
+  const [currentToken, setCurrentToken] = useState(localStorage.getItem('token'))
 
   useEffect(() => {
-    const userId = localStorage.getItem('userId');
-    const token = localStorage.getItem('token');
-
+    
     if (!userId || !token) {
       console.warn('Missing userId or token in localStorage');
       return;
@@ -51,7 +51,7 @@ export const SocketProvider = ({ children }) => {
       newSocket.disconnect();
       clearInterval(heartbeat);
     };
-  }, [userId, token]);
+  }, [currentUserId, currentToken]);
 
   return (
     <SocketContext.Provider value={{ socket, isConnected, lastPing }}>
