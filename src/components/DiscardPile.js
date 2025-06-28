@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const DiscardPile = ({ cards, onClick, isActive }) => {
+const DiscardPile = ({ cards, onClick, isActive, className }) => {
     const validCards = Array.isArray(cards) ? cards : [];
     const topCard = validCards.length > 0 ? validCards[validCards.length - 1] : null;
     
@@ -36,7 +36,8 @@ const DiscardPile = ({ cards, onClick, isActive }) => {
 DiscardPile.propTypes = {
     cards: PropTypes.array.isRequired,
     onClick: PropTypes.func,
-    isActive: PropTypes.bool
+    isActive: PropTypes.bool,
+    className: PropTypes.string
 };
 
 export default DiscardPile;
