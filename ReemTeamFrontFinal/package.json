@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "postcss-flexbugs-fixes": "^5.0.2"
+  }
+}
