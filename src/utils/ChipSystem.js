@@ -11,10 +11,11 @@ class ChipSystem {
     try {
         const response = await axios.get(
             `${process.env.REACT_APP_API_BASE_URL}/users/${username}/balance`,
-            { 
-                headers: { 
-                    Authorization: `Bearer ${localStorage.getItem('token')}` 
-                }
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                },
+                withCredentials: true // Crucial for sending cookies/auth headers cross-origin
             }
         );
         return response.data.chips;

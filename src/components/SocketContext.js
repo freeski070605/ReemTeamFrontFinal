@@ -28,57 +28,56 @@ export const SocketProvider = ({ children }) => {
   }, [handleLoginSuccess]); // Dependency on memoized handler
 
   useEffect(() => {
-    
-    if (!currentUserId || !currentToken) {
-      console.warn('Missing userId or token in localStorage. Socket connection skipped.');
-      // Disconnect existing socket if credentials become invalid
+    // Only attempt to connect if currentUserId and currentToken are available
+    if (currentUserId && currentToken) {
+      // Disconnect existing socket before creating a new one if dependencies change
+      if (socket) {
+        socket.disconnect();
+      }
+
+      const socketUrl = process.env.REACT_APP_SOCKET_URL || 'https://reemteamserver.onrender.com';
+      const newSocket = io(socketUrl, {
+        transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        timeout: 20000,
+        query: { userId: currentUserId, token: currentToken }
+      });
+
+      setSocket(newSocket);
+
+      newSocket.on('connect', () => {
+        console.log('✅ Socket connected');
+        setIsConnected(true);
+      });
+
+      newSocket.on('disconnect', () => {
+        console.log('⚠️ Socket disconnected');
+        setIsConnected(false);
+      });
+
+      newSocket.on('ping', () => setLastPing(Date.now()));
+
+      const heartbeat = setInterval(() => {
+        if (newSocket.connected) {
+          newSocket.emit('ping');
+        }
+      }, 30000);
+
+      return () => {
+        newSocket.off('disconnect'); // Unregister the disconnect listener
+        clearInterval(heartbeat);
+      };
+    } else {
+      console.warn('Missing userId or token in localStorage. Socket connection skipped or disconnected.');
+      // Disconnect existing socket if credentials become invalid or are missing
       if (socket) {
         socket.disconnect();
         setSocket(null);
         setIsConnected(false);
       }
-      return;
     }
-    
-    // Disconnect existing socket before creating a new one if dependencies change
-    if (socket) {
-      socket.disconnect();
-    }
-
-    const socketUrl = process.env.REACT_APP_SOCKET_URL || 'https://reemteamserver.onrender.com';
-    const newSocket = io(socketUrl, {
-      transports: ['websocket', 'polling'],
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      timeout: 20000,
-      query: { currentUserId, currentToken }
-    });
-
-    setSocket(newSocket);
-
-    newSocket.on('connect', () => {
-      console.log('✅ Socket connected');
-      setIsConnected(true);
-    });
-
-    newSocket.on('disconnect', () => {
-      console.log('⚠️ Socket disconnected');
-      setIsConnected(false);
-    });
-
-    newSocket.on('ping', () => setLastPing(Date.now()));
-
-    const heartbeat = setInterval(() => {
-      if (newSocket.connected) {
-        newSocket.emit('ping');
-      }
-    }, 30000);
-
-    return () => {
-      newSocket.off('disconnect'); // Unregister the disconnect listener
-      clearInterval(heartbeat);
-    };
   }, [currentUserId, currentToken]); // Dependencies for re-running the effect
 
   return (
