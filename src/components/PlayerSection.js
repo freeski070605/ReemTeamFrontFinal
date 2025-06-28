@@ -5,8 +5,6 @@ import PlayerHand from './PlayerHand';
 import PlayerSpreads from './PlayerSpreads';
 import PlayerActions from './PlayerActions';
 import { isValidSpread, calculatePoints, findBestSpread, isValidHit } from '../utils/gameUtils';
-import './PlayerSection.css';
-
 const MemoizedPlayerInfo = memo(PlayerInfo);
 const MemoizedPlayerHand = memo(PlayerHand);
 const MemoizedPlayerSpreads = memo(PlayerSpreads);
@@ -145,73 +143,74 @@ const PlayerSection = ({
 
     return (
         <div
-          className={`player-section ${position} ${isCurrentTurn ? 'active' : ''} ${className || ''} ${
-            penalties[position] > 0 ? 'penalized' : ''
-          }`}
+            className={`flex flex-col items-center justify-center p-sm rounded-md bg-darkBackground/90 shadow-sm border-1.5 border-transparent z-10 transition-all duration-300
+            ${isCurrentTurn ? 'border-accentGold shadow-lg animate-activePulse' : ''}
+            ${penalties[position] > 0 ? 'opacity-70' : ''}
+            ${className || ''}`}
         >
-          {error && <div className="error-message">{error}</div>}
-      
-          <div className="player-main">
-            <MemoizedPlayerInfo
-              player={player}
-              isActive={isCurrentTurn}
-              className="player-info"
-            />
-      
-            <MemoizedPlayerHand
-              key={`hand-${safeHand.length}-${isCurrentTurn}-${gameState?.updateId || 'initial'}`}
-              cards={safeHand}
-              isActive={isCurrentTurn && !isSpectator}
-              onCardClick={handleCardClick}
-              isHidden={isHidden}
-              hitMode={hitMode}
-              onToggleHitMode={onToggleHitMode}
-              selectedCard={selectedCard}
-              onCardSelect={onCardSelect}
-              className={`player-hand ${position}`}
-              playerIndex={playerIndex}
-            />
-          </div>
-      
-          <div className="player-side">
-            <MemoizedPlayerSpreads
-              key={`spreads-${position}-${gameState?.updateId || 'initial'}`}
-              spreads={safeSpreads}
-              onSpreadClick={handleHit}
-              isHitModeActive={hitMode}
-              selectedCard={selectedCard}
-              isCurrentPlayer={isCurrentPlayer}
-              isSpectator={isSpectator}
-              position={position}
-              className={`player-spreads ${position}`}
-              playerIndex={playerIndex}
-            />
-      
-            {showActions && isCurrentTurn && !isHidden && !isSpectator && (
-              <MemoizedPlayerActions
-                isActive={isCurrentTurn}
-                canSpread={isValidSpread}
-                canHit={canHit}
-                hasDrawnCard={hasDrawnCard}
-                onSpread={handleSpread}
-                onHit={handleHit}
-                onToggleHitMode={onToggleHitMode}
-                isHitModeActive={hitMode}
-                onDrop={handleDropAction}
-                canDrop={canDropBasedOnPoints}
-                gameState={gameState || {}}
-                setGameState={setGameState}
-                onActionComplete={onActionComplete}
-                className="player-actions"
-              />
-            )}
-          </div>
-      
-          {penalties[position] > 0 && (
-            <div className="penalty-indicator">
-              Penalized: {penalties[position]} turns
+            {error && <div className="text-error text-sm font-bold mb-sm">{error}</div>}
+
+            <div className="flex flex-col items-center w-full">
+                <MemoizedPlayerInfo
+                    player={player}
+                    isActive={isCurrentTurn}
+                    className="mb-sm"
+                />
+
+                <MemoizedPlayerHand
+                    key={`hand-${safeHand.length}-${isCurrentTurn}-${gameState?.updateId || 'initial'}`}
+                    cards={safeHand}
+                    isActive={isCurrentTurn && !isSpectator}
+                    onCardClick={handleCardClick}
+                    isHidden={isHidden}
+                    hitMode={hitMode}
+                    onToggleHitMode={onToggleHitMode}
+                    selectedCard={selectedCard}
+                    onCardSelect={onCardSelect}
+                    className="w-full"
+                    playerIndex={playerIndex}
+                />
             </div>
-          )}
+
+            <div className="flex flex-col items-center w-full mt-sm">
+                <MemoizedPlayerSpreads
+                    key={`spreads-${position}-${gameState?.updateId || 'initial'}`}
+                    spreads={safeSpreads}
+                    onSpreadClick={handleHit}
+                    isHitModeActive={hitMode}
+                    selectedCard={selectedCard}
+                    isCurrentPlayer={isCurrentPlayer}
+                    isSpectator={isSpectator}
+                    position={position}
+                    className="w-full"
+                    playerIndex={playerIndex}
+                />
+
+                {showActions && isCurrentTurn && !isHidden && !isSpectator && (
+                    <MemoizedPlayerActions
+                        isActive={isCurrentTurn}
+                        canSpread={isValidSpread}
+                        canHit={canHit}
+                        hasDrawnCard={hasDrawnCard}
+                        onSpread={handleSpread}
+                        onHit={handleHit}
+                        onToggleHitMode={onToggleHitMode}
+                        isHitModeActive={hitMode}
+                        onDrop={handleDropAction}
+                        canDrop={canDropBasedOnPoints}
+                        gameState={gameState || {}}
+                        setGameState={setGameState}
+                        onActionComplete={onActionComplete}
+                        className="mt-md flex flex-wrap justify-center gap-sm"
+                    />
+                )}
+            </div>
+
+            {penalties[position] > 0 && (
+                <div className="text-error text-sm font-bold mt-sm">
+                    Penalized: {penalties[position]} turns
+                </div>
+            )}
         </div>
       );
     };

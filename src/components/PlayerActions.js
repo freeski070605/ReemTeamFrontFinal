@@ -111,25 +111,33 @@ const PlayerActions = ({
     };
 
     return (
-        <div className="player-actions">
+        <div className="flex gap-2 justify-center mt-3">
             <button
-                className={`action-button drop ${!hasDrawnCard && canDrop && gameState.players[gameState.currentTurn]?.hitPenaltyRounds === 0 ? 'active' : ''}`}
+                className={`px-4 py-2 rounded-md font-medium transition-colors duration-200
+                            ${!hasDrawnCard && canDrop && gameState.players[gameState.currentTurn]?.hitPenaltyRounds === 0
+                                ? 'bg-success text-lightText hover:bg-green-700'
+                                : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'}`}
                 disabled={!isActive || hasDrawnCard || !canDrop || gameState.players[gameState.currentTurn]?.hitPenaltyRounds > 0}
                 onClick={handleDropAction}
             >
                 Drop {gameState.players[gameState.currentTurn]?.hitPenaltyRounds > 0 ? `(${gameState.players[gameState.currentTurn]?.hitPenaltyRounds})` : ''}
             </button>
             <button
-                className={`action-button spread ${hasDrawnCard && canSpread && !gameState.isProcessingAction ? 'active' : ''}`}
+                className={`px-4 py-2 rounded-md font-medium transition-colors duration-200
+                            ${hasDrawnCard && canSpread && !gameState.isProcessingAction
+                                ? 'bg-primary text-lightText hover:bg-blue-700'
+                                : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'}`}
                 disabled={!canSpread || gameState.isProcessingAction}
                 onClick={handleSpreadAction}
             >
                 {gameState.isProcessingAction ? 'Processing...' : 'Spread'}
             </button>
-            <button 
-                 className={`action-button hit ${isHitModeActive ? 'active' : ''}`}
-                 onClick={handleHitClick}
-                 disabled={!isActive || !hasDrawnCard || !canHit}
+            <button
+                className={`px-4 py-2 rounded-md font-medium transition-colors duration-200
+                            ${isHitModeActive ? 'bg-secondary text-darkText' : 'bg-info text-lightText hover:bg-blue-500'}
+                            ${!isActive || !hasDrawnCard || !canHit ? 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50' : ''}`}
+                onClick={handleHitClick}
+                disabled={!isActive || !hasDrawnCard || !canHit}
             >
                 Hit
             </button>

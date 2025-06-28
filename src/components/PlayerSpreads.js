@@ -1,6 +1,5 @@
 import React from 'react';
 import { PLAYER_POSITIONS } from './gameConstants';
-import './PlayerSpreads.css';
 import PropTypes from 'prop-types'; // Import PropTypes
 
 const PlayerSpreads = ({
@@ -51,31 +50,32 @@ const PlayerSpreads = ({
   // const areSpreadsClickable = isCurrentPlayer && isHitModeActive && selectedCard !== null && !isSpectator;
 
   return (
-    <div className={`spreads-container ${className}`}>
-      <div className="spreads-scroll">
-        {spreads.map((spread, spreadIndex) => (
-          <div
-            key={`spread-${spreadIndex}`}
-            className={`spread-group`} // Removed clickable-spread class
-            onClick={(event) => handleSpreadClick(spreadIndex, event)}
-            // Removed inline style prop that added border and cursor
-          >
-            {spread.map((card, cardIndex) => (
-              <div
-                key={`${card.rank}-${card.suit}-${cardIndex}`}
-                className="spread-card-wrapper"
-              >
-                <img
-                  src={`/assets/cards/${card.rank}_of_${card.suit}.png`}
-                  alt={`${card.rank} of ${card.suit}`}
-                  className="spread-card-image"
-                />
-              </div>
-            ))}
+      <div className={`w-full p-2 overflow-x-visible rounded-lg shadow-none ${className}`}>
+          <div className="flex flex-row gap-2 p-1 w-full max-w-full overflow-x-auto">
+              {spreads.map((spread, spreadIndex) => (
+                  <div
+                      key={`spread-${spreadIndex}`}
+                      className={`flex gap-1 bg-accentGold/10 p-2 rounded-lg min-w-fit cursor-pointer transition-all duration-200 ease-in-out shadow-sm border-2 border-transparent
+                                  hover:translate-y-[-4px] hover:scale-105 hover:bg-accentGold/20 hover:shadow-lg hover:border-accentGold
+                                  ${isHitModeActive && selectedCard !== null && !isSpectator ? 'border-primary' : ''}`}
+                      onClick={(event) => handleSpreadClick(spreadIndex, event)}
+                  >
+                      {spread.map((card, cardIndex) => (
+                          <div
+                              key={`${card.rank}-${card.suit}-${cardIndex}`}
+                              className="w-10 max-w-16 min-w-7 relative rounded-md shadow-sm"
+                          >
+                              <img
+                                  src={`${process.env.PUBLIC_URL}/assets/cards/${card.rank}_of_${card.suit}.png`}
+                                  alt={`${card.rank} of ${card.suit}`}
+                                  className="w-full h-auto rounded-md shadow-sm bg-cardBackground transition-all duration-200 ease-in-out"
+                              />
+                          </div>
+                      ))}
+                  </div>
+              ))}
           </div>
-        ))}
       </div>
-    </div>
   );
 };
 

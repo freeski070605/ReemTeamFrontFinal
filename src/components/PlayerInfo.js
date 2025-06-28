@@ -23,13 +23,14 @@ const PlayerInfo = ({ player = {}, isActive = false }) => {
     }, [player.username, player.chips, user?.username]);
 
     return (
-        <div className={`player-info ${isActive ? 'active' : ''}`}>
-            <div className="player-name">{player.username || 'Player'}</div>
-            <div className="player-chips">
-                <span className="chip-icon">💰</span>
-                <span className="chip-count">{chipBalance}</span>
+        <div className={`bg-darkBackground/60 text-accentGold font-bold p-2 px-3 rounded-lg text-center shadow-sm
+                        ${isActive ? 'border-2 border-accentGold animate-pulse' : ''}`}>
+            <div className="text-lg">{player.username || 'Player'}</div>
+            <div className="flex items-center justify-center text-lightText text-md mt-1">
+                <span className="mr-1">💰</span>
+                <span>{chipBalance}</span>
             </div>
-            {isActive && <div className="turn-indicator">Current Turn</div>}
+            {isActive && <div className="text-primary text-sm mt-1">Current Turn</div>}
         </div>
     );
 };

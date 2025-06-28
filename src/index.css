@@ -1,12 +1,14 @@
-/* @import './styles/variables.css'; Import global CSS variables */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Nunito', sans-serif; /* Using Nunito as per design system */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #1a202c; /* Dark background for game */
+  color: #e2e8f0; /* Light text color */
 }
 
 code {

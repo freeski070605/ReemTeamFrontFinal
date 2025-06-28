@@ -7,37 +7,26 @@ const DiscardPile = ({ cards, onClick, isActive }) => {
     
     return (
         <div 
-            className={`discard-pile ${isActive ? 'active' : ''}`}
+            className={`relative flex items-center justify-center transition-transform duration-200 ease-in
+                        ${isActive ? 'cursor-pointer hover:scale-105' : 'cursor-default opacity-70'}
+                        ${className}`}
             onClick={() => isActive && onClick && onClick()}
-            style={{
-                background: 'linear-gradient(145deg, rgba(26, 26, 26, 0.8), rgba(45, 45, 45, 0.8))',
-                borderRadius: '10px',
-                border: '1px solid rgba(255, 215, 0, 0.15)',
-                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}
         >
             {!topCard ? (
-                <div className="empty-pile">
-                    <div className="empty-pile-text">Discard Pile</div>
+                <div className="w-full h-full flex flex-col items-center justify-center text-lightText/70 text-sm text-center">
+                    <span className="text-xs">Discard</span>
+                    <span className="text-lg font-bold">Pile</span>
                 </div>
             ) : (
-                <div className="pile-container">
-                    <div className="card-count">{validCards.length}</div>
-                    <div className="top-card">
-                        <img 
-                            src={`${process.env.PUBLIC_URL}/assets/cards/${topCard.rank}_of_${topCard.suit}.png`}
-                            alt={`${topCard.rank} of ${topCard.suit}`}
-                            className="card-image"
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'contain',
-                                borderRadius: '10px',
-                                boxShadow: '0 5px 15px rgba(0, 0, 0, 0.3)'
-                            }}
-                        />
+                <div className="relative w-full h-full flex items-center justify-center">
+                    <div className="absolute bottom-1 right-1 bg-darkBackground/80 text-lightText text-xs font-bold rounded-full px-2 py-0.5">
+                        {validCards.length}
                     </div>
+                    <img
+                        src={`${process.env.PUBLIC_URL}/assets/cards/${topCard.rank}_of_${topCard.suit}.png`}
+                        alt={`${topCard.rank} of ${topCard.suit}`}
+                        className="w-full h-full object-contain rounded-md shadow-md"
+                    />
                 </div>
             )}
         </div>

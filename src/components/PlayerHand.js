@@ -1,30 +1,15 @@
 import React from 'react';
-import './PlayerHand.css';
-
 const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selectedCard, isHidden }) => {
     if (!Array.isArray(cards)) return null;
 
     const suitOrder = ['clubs', 'diamonds', 'hearts', 'spades'];
     const rankOrder = ['ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-    // Map card ranks to their actual filename prefixes to handle case sensitivity
     const rankToFilenameMap = {
-        'ace': 'ace',
-        '2': '2',
-        '3': '3',
-        '4': '4',
-        '5': '5',
-        '6': '6',
-        '7': '7',
-        '8': '8',
-        '9': '9',
-        '10': '10',
-        'J': 'j', // Map 'J' to 'j' for filename consistency
-        'Q': 'Q',
-        'K': 'K',
+        'ace': 'ace', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9', '10': '10',
+        'J': 'j', 'Q': 'Q', 'K': 'K',
     };
 
-    // Attach originalIndex and sort cards
     const sortedCards = cards
         .map((card, originalIndex) => ({ ...card, originalIndex }))
         .sort((a, b) => {
@@ -50,46 +35,52 @@ const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selec
     };
 
     return (
-        <div className={`player-hand-container ${isActive ? 'active' : ''}`}>
-            <div className="cards-scroll-container">
-                <div className="cards-wrapper">
+        <div className="flex justify-center items-center w-full max-w-full p-0 overflow-visible relative z-2 min-h-[36px] rounded-lg">
+            <div className="flex flex-row flex-nowrap items-center gap-2 w-full min-w-0 max-w-full h-11 m-0 p-0 justify-center overflow-x-auto overscroll-x-contain scrollbar-hide
+                            sm:flex-wrap sm:overflow-x-hidden sm:h-auto sm:gap-3
+                            lg:flex-nowrap lg:overflow-x-visible lg:h-11 lg:gap-2">
                 {sortedCards.map((card, i) => {
-                    // Fanned hand effect: center card is 0deg, others spread left/right
                     const total = sortedCards.length;
-                    const spread = Math.min(90, total * 12); // max 90deg spread, 12deg per card
+                    const spread = Math.min(90, total * 12);
                     const start = -spread / 2;
                     const angle = start + (i * (spread / (total - 1 || 1)));
-                    // Curve: cards further from center are slightly lower
-                    const curve = Math.abs(angle) * 0.7; // px down for curve
-                    const filenameRank = rankToFilenameMap[card.rank] || card.rank; // Use mapped rank or original
+                    const curve = Math.abs(angle) * 0.7;
+                    const filenameRank = rankToFilenameMap[card.rank] || card.rank;
+
+                    const cardClasses = `
+                        flex-shrink-0 cursor-pointer transition-all duration-200 ease-in-out transform-gpu
+                        w-11 max-w-[70px] min-w-8 rounded-md bg-cardBackground shadow-sm border-2 border-transparent relative z-10
+                        hover:scale-110 hover:-translate-y-2 hover:shadow-lg hover:border-accentGold hover:z-30
+                        ${isActive ? 'pointer-events-auto' : 'pointer-events-none'}
+                        ${selectedCard === card.originalIndex ? 'scale-110 -translate-y-4 shadow-xl border-accentGold z-40' : ''}
+                    `;
+
                     return (
-                      <div
-                        key={`${card.rank}-${card.suit}-${card.originalIndex}`}
-                        className={`
-                            card
-                            ${isActive ? 'clickable' : ''}
-                            ${selectedCard === card.originalIndex ? 'selected' : ''}
-                            ${hitMode ? 'hit-mode' : 'discard-mode'}
-                        `}
-                        style={{
-                          transform: `rotate(${angle}deg) translateY(${curve}px)`
-                        }}
-                        onClick={() => handleCardInteraction(card.originalIndex)}
-                      >
-                        <img
-                          src={
-                            isHidden
-                              ? `${process.env.REACT_APP_PUBLIC_URL}assets/cards/back.png`
-                              : `${process.env.REACT_APP_PUBLIC_URL}assets/cards/${filenameRank}_of_${card.suit}.png`
-                          }
-                          alt={isHidden ? 'Card Back' : `${card.rank} of ${card.suit}`}
-                          className="card-image"
-                        />
-                      </div>
+                        <div
+                            key={`${card.rank}-${card.suit}-${card.originalIndex}`}
+                            className={cardClasses}
+                            style={{
+                                transform: `rotate(${angle}deg) translateY(${curve}px)`,
+                                // Override for mobile/tablet to prevent fanning
+                                '@media (max-width: 1024px)': {
+                                    transform: 'none !important',
+                                },
+                            }}
+                            onClick={() => handleCardInteraction(card.originalIndex)}
+                        >
+                            <img
+                                src={
+                                    isHidden
+                                        ? `${process.env.REACT_APP_PUBLIC_URL}assets/cards/back.png`
+                                        : `${process.env.REACT_APP_PUBLIC_URL}assets/cards/${filenameRank}_of_${card.suit}.png`
+                                }
+                                alt={isHidden ? 'Card Back' : `${card.rank} of ${card.suit}`}
+                                className="w-full h-auto select-none pointer-events-none rounded-[8px] shadow-sm bg-cardBackground"
+                            />
+                        </div>
                     );
                 })}
             </div>
-        </div>
         </div>
     );
 };

@@ -3,12 +3,10 @@ import PropTypes from 'prop-types';
 import Deck from './Deck';
 import DiscardPile from './DiscardPile';
 import GameInfo from './GameInfo';
-import "./CenterGameArea.css";
-
 const CenterGameArea = ({
     deck = [],
     discardPile = [],
-    currentTurn = 0, // Add default value
+    currentTurn = 0,
     hasDrawnCard = false,
     handlePlayerAction,
     isLoading = false,
@@ -29,38 +27,47 @@ const CenterGameArea = ({
         }
     }, [discardPile.length, hasDrawnCard, handlePlayerAction]);
 
-    // Ensure currentTurn is a valid number
     const validCurrentTurn = typeof currentTurn === 'number' && currentTurn >= 0 ? currentTurn : 0;
 
     return (
-        <div className="center-area">   
-                
-                <div className="pile-row">
-                <Deck 
+        <div className="flex flex-col items-center justify-center relative z-5 p-1 transition-all duration-300
+                        sm:w-[60vw] sm:h-[60vw] sm:max-w-[400px] sm:max-h-[400px] sm:min-w-[180px] sm:min-h-[180px] sm:border-4 sm:rounded-full sm:bg-gradient-to-br from-primary to-secondary sm:shadow-lg
+                        lg:w-[40vw] lg:h-[40vw] lg:max-w-[600px] lg:max-h-[600px] lg:min-w-[320px] lg:min-h-[320px] lg:border-6 lg:rounded-full lg:bg-gradient-to-br from-primary to-secondary lg:shadow-xl">
+
+            <div className="flex flex-row justify-center items-end gap-1 mt-0 w-full max-w-full flex-wrap
+                            sm:gap-2
+                            lg:gap-3">
+                <Deck
                     cards={deck || []}
                     drawCard={handleDeckDraw}
                     isActive={validCurrentTurn === 0 && !hasDrawnCard}
-                    className="deck"
+                    className="w-9 aspect-[2.5/3.5] rounded-md bg-cardBackground shadow-sm border-1.5 border-primary transition-all duration-200
+                                sm:w-12 sm:rounded-lg
+                                lg:w-16 lg:rounded-xl"
                 />
-                
-                <GameInfo 
+
+                <GameInfo
                     pot={pot}
                     currentTurn={validCurrentTurn}
                     players={players}
-                    className="game-info pot-display"
+                    className="p-1 px-2 bg-darkBackground/90 rounded-md text-accentGold font-bold text-xs text-center shadow-sm border-1.5 border-accentGold
+                                sm:text-sm sm:rounded-lg sm:p-1.5 sm:px-2
+                                lg:text-base lg:rounded-xl lg:p-2 lg:px-3"
                 />
-                
-                <DiscardPile 
+
+                <DiscardPile
                     cards={discardPile || []}
                     onClick={handleDiscardDraw}
                     isActive={!hasDrawnCard && (discardPile?.length > 0)}
-                    className="discard-pile"
+                    className="w-9 aspect-[2.5/3.5] rounded-md bg-cardBackground shadow-sm border-1.5 border-primary transition-all duration-200
+                                sm:w-12 sm:rounded-lg
+                                lg:w-16 lg:rounded-xl"
                 />
-                </div>
-            
+            </div>
+
             {isLoading && (
-                <div className="loading-overlay">
-                    <div className="spinner"></div>
+                <div className="absolute inset-0 flex items-center justify-center bg-darkBackground/70 z-50">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                 </div>
             )}
         </div>

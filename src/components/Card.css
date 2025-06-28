@@ -1,24 +1,2 @@
-/* Card.css - Unified card style */
-
-.card,
-.deck img,
-.discard-pile img {
-  width: clamp(55px, 10vw, 90px); /* Slightly reduced min-width for better fit */
-  aspect-ratio: 2.5 / 3.5;
-  border-radius: 8px;
-  object-fit: contain;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease;
-}
-
-.card:hover,
-.deck img:hover,
-.discard-pile img:hover {
-  transform: scale(1.05);
-}
-
-.card.selected {
-  transform: translateY(-12px);
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-  z-index: 5;
-}
+/* Card.css - All styles moved to Tailwind classes in Card.js */
+/* This file can now be safely removed or left empty. */
