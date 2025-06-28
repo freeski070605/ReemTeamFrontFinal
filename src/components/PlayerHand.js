@@ -79,8 +79,8 @@ const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selec
                         <img
                           src={
                             isHidden
-                              ? `${process.env.PUBLIC_URL}/assets/cards/back.png`
-                              : `${process.env.PUBLIC_URL}/assets/cards/${filenameRank}_of_${card.suit}.png`
+                              ? `${process.env.REACT_APP_PUBLIC_URL}assets/cards/back.png`
+                              : `${process.env.REACT_APP_PUBLIC_URL}assets/cards/${filenameRank}_of_${card.suit}.png`
                           }
                           alt={isHidden ? 'Card Back' : `${card.rank} of ${card.suit}`}
                           className="card-image"

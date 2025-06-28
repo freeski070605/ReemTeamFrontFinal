@@ -5,8 +5,8 @@ import './Card.css'; // Import the CSS file
 
 const Card = ({ card, onClick, isSelected, isHidden, className }) => {
     const cardImage = isHidden 
-        ? `${process.env.PUBLIC_URL}/assets/cards/back.png`
-        : `${process.env.PUBLIC_URL}/assets/cards/${card.rank}_of_${card.suit}.png`;
+        ? `${process.env.REACT_APP_PUBLIC_URL}assets/cards/back.png`
+        : `${process.env.REACT_APP_PUBLIC_URL}assets/cards/${card.rank}_of_${card.suit}.png`;
 
     return (
         <div 
