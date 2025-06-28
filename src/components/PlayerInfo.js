@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from './UserContext';
 import ChipSystem from '../utils/ChipSystem';
 
-const PlayerInfo = ({ player = {}, isActive = false }) => {
+const PlayerInfo = ({ player = {}, isActive = false, handScore = null }) => {
     const { user } = useContext(UserContext);
     const [chipBalance, setChipBalance] = useState(player.chips);
 
@@ -30,6 +30,12 @@ const PlayerInfo = ({ player = {}, isActive = false }) => {
                 <span className="mr-1">💰</span>
                 <span>{chipBalance}</span>
             </div>
+            {handScore !== null && (
+                <div className="text-lightText text-md mt-1">
+                    <span className="mr-1">🃏</span>
+                    <span>Score: {handScore}</span>
+                </div>
+            )}
         </div>
     );
 };

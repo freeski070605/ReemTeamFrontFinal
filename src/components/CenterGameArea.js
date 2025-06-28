@@ -41,9 +41,9 @@ const CenterGameArea = ({
                     cards={deck || []}
                     drawCard={handleDeckDraw}
                     isActive={validCurrentTurn === 0 && !hasDrawnCard}
-                    className="w-9 aspect-[2.5/3.5] rounded-md bg-cardBackground shadow-sm border-1.5 border-primary transition-all duration-200
-                                sm:w-12 sm:rounded-lg
-                                lg:w-16 lg:rounded-xl"
+                    className="w-12 aspect-[2.5/3.5] rounded-md bg-cardBackground shadow-sm border-1.5 border-primary transition-all duration-200
+                                sm:w-16 sm:rounded-lg
+                                lg:w-20 lg:rounded-xl"
                 />
 
                 <GameInfo
@@ -59,9 +59,9 @@ const CenterGameArea = ({
                     cards={discardPile || []}
                     onClick={handleDiscardDraw}
                     isActive={!hasDrawnCard && (discardPile?.length > 0)}
-                    className="w-9 aspect-[2.5/3.5] rounded-md bg-cardBackground shadow-sm border-1.5 border-primary transition-all duration-200
-                                sm:w-12 sm:rounded-lg
-                                lg:w-16 lg:rounded-xl"
+                    className="w-12 aspect-[2.5/3.5] rounded-md bg-cardBackground shadow-sm border-1.5 border-primary transition-all duration-200
+                                sm:w-16 sm:rounded-lg
+                                lg:w-20 lg:rounded-xl"
                 />
             </div>
 

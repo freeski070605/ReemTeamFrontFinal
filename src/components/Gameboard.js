@@ -406,6 +406,14 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
       });
     }, [gameState?.playerHands, gameState?.playerSpreads]);
   
+    // Calculate the current player's hand score
+    const currentPlayerHandScore = useMemo(() => {
+      if (currentPlayerIndex === -1 || !playerScores || playerScores.length === 0) {
+        return null;
+      }
+      return playerScores[currentPlayerIndex];
+    }, [playerScores, currentPlayerIndex]);
+  
     useEffect(() => {
       if (gameState?.deck?.length === 0 && gameState?.gameStarted && !gameState?.gameOver) {
         const finalScores = gameState.playerHands.map(hand =>
@@ -504,6 +512,7 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                                     totalPlayers={reorderedPlayers.length}
                                     isSpectator={isSpectator}
                                     showActions={false} // Actions are separate for mobile
+                                    handScore={null} // AI/Other players don't show score
                                 />
                             );
                         })}
@@ -555,6 +564,7 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                             totalPlayers={reorderedPlayers.length}
                             isSpectator={isSpectator}
                             showActions={showPlayerActions} // Show actions for the current player
+                            handScore={currentPlayerHandScore} // Show score for current player
                         />
 
                     </div>
@@ -621,6 +631,7 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                                     totalPlayers={reorderedPlayers.length}
                                     isSpectator={isSpectator}
                                     showActions={showActions}
+                                    handScore={isCurrentPlayer ? currentPlayerHandScore : null} // Show score only for the current player
                                 />
                             );
                         })}
