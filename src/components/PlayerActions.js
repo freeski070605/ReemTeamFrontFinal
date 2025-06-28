@@ -111,35 +111,35 @@ const PlayerActions = ({
     };
 
     return (
-        <div className="flex gap-2 justify-center mt-3">
+        <div className="fixed bottom-0 left-0 right-0 bg-darkBackground/90 p-md shadow-top z-50 flex justify-center gap-md">
             <button
-                className={`px-4 py-2 rounded-md font-medium transition-colors duration-200
+                className={`flex-1 px-4 py-2 rounded-md font-medium transition-colors duration-200 flex items-center justify-center gap-2
                             ${!hasDrawnCard && canDrop && gameState.players[gameState.currentTurn]?.hitPenaltyRounds === 0
                                 ? 'bg-success text-lightText hover:bg-green-700'
                                 : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'}`}
                 disabled={!isActive || hasDrawnCard || !canDrop || gameState.players[gameState.currentTurn]?.hitPenaltyRounds > 0}
                 onClick={handleDropAction}
             >
-                Drop {gameState.players[gameState.currentTurn]?.hitPenaltyRounds > 0 ? `(${gameState.players[gameState.currentTurn]?.hitPenaltyRounds})` : ''}
+                <span role="img" aria-label="drop">👇</span> Drop {gameState.players[gameState.currentTurn]?.hitPenaltyRounds > 0 ? `(${gameState.players[gameState.currentTurn]?.hitPenaltyRounds})` : ''}
             </button>
             <button
-                className={`px-4 py-2 rounded-md font-medium transition-colors duration-200
+                className={`flex-1 px-4 py-2 rounded-md font-medium transition-colors duration-200 flex items-center justify-center gap-2
                             ${hasDrawnCard && canSpread && !gameState.isProcessingAction
                                 ? 'bg-primary text-lightText hover:bg-blue-700'
                                 : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'}`}
                 disabled={!canSpread || gameState.isProcessingAction}
                 onClick={handleSpreadAction}
             >
-                {gameState.isProcessingAction ? 'Processing...' : 'Spread'}
+                <span role="img" aria-label="spread">👐</span> {gameState.isProcessingAction ? 'Processing...' : 'Spread'}
             </button>
             <button
-                className={`px-4 py-2 rounded-md font-medium transition-colors duration-200
+                className={`flex-1 px-4 py-2 rounded-md font-medium transition-colors duration-200 flex items-center justify-center gap-2
                             ${isHitModeActive ? 'bg-secondary text-darkText' : 'bg-info text-lightText hover:bg-blue-500'}
                             ${!isActive || !hasDrawnCard || !canHit ? 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50' : ''}`}
                 onClick={handleHitClick}
                 disabled={!isActive || !hasDrawnCard || !canHit}
             >
-                Hit
+                <span role="img" aria-label="hit">🎯</span> Hit
             </button>
         </div>
     );

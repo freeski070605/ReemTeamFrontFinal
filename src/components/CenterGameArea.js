@@ -31,8 +31,8 @@ const CenterGameArea = ({
 
     return (
         <div className="flex flex-col items-center justify-center relative z-5 p-1 transition-all duration-300
-                        sm:w-[60vw] sm:h-[60vw] sm:max-w-[400px] sm:max-h-[400px] sm:min-w-[180px] sm:min-h-[180px] sm:border-4 sm:rounded-full sm:bg-gradient-to-br from-primary to-secondary sm:shadow-lg
-                        lg:w-[40vw] lg:h-[40vw] lg:max-w-[600px] lg:max-h-[600px] lg:min-w-[320px] lg:min-h-[320px] lg:border-6 lg:rounded-full lg:bg-gradient-to-br from-primary to-secondary lg:shadow-xl">
+                        sm:w-[60vw] sm:h-[60vw] sm:max-w-[400px] sm:max-h-[400px] sm:min-w-[180px] sm:min-h-[180px] sm:border-4 sm:rounded-full sm:bg-tableFelt sm:shadow-lg
+                        lg:w-[40vw] lg:h-[40vw] lg:max-w-[600px] lg:max-h-[600px] lg:min-w-[320px] lg:min-h-[320px] lg:border-6 lg:rounded-full lg:bg-tableFelt lg:shadow-xl">
 
             <div className="flex flex-row justify-center items-end gap-1 mt-0 w-full max-w-full flex-wrap
                             sm:gap-2

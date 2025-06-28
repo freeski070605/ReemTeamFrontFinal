@@ -509,7 +509,7 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                         })}
 
                         <CenterGameArea
-                            className="center-area w-11/12 h-[200px] max-w-xs mx-auto my-md rounded-md bg-gradient-to-br from-primary to-secondary border-3 border-accentGold shadow-lg flex flex-col justify-center items-center z-5 transition-all duration-300"
+                            className="center-area w-11/12 h-[200px] max-w-xs mx-auto my-md rounded-md bg-tableFelt border-3 border-accentGold shadow-lg flex flex-col justify-center items-center z-5 transition-all duration-300"
                             deck={gameState?.deck || []}
                             discardPile={gameState?.discardPile || []}
                             currentTurn={adjustedCurrentTurn}
@@ -524,7 +524,7 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                         <PlayerSection
                             key={`${currentPlayerObject?.username || `player-0`}-mobile-current-${gameState?.timestamp || 'initial'}`}
                             position="static"
-                            className={`player w-full max-w-full min-h-[80px] flex flex-col items-center justify-center p-sm rounded-md bg-darkBackground/90 shadow-sm border-1.5 border-transparent z-10 transition-all duration-300
+                            className={`player w-full max-w-full min-h-[80px] flex flex-col items-center justify-center p-sm rounded-md bg-darkBackground/90 shadow-sm border-1.5 border-transparent z-10 transition-all duration-300 mb-8
                                         ${adjustedCurrentTurn === 0 ? 'border-accentGold shadow-lg' : ''}`}
                             player={currentPlayerObject}
                             hand={reorderedHands[0] || []}

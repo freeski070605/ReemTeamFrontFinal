@@ -30,7 +30,6 @@ const PlayerInfo = ({ player = {}, isActive = false }) => {
                 <span className="mr-1">💰</span>
                 <span>{chipBalance}</span>
             </div>
-            {isActive && <div className="text-primary text-sm mt-1">Current Turn</div>}
         </div>
     );
 };

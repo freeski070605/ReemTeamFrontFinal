@@ -143,14 +143,19 @@ const PlayerSection = ({
 
     return (
         <div
-            className={`flex flex-col items-center justify-center p-sm rounded-md bg-darkBackground/90 shadow-sm border-1.5 border-transparent z-10 transition-all duration-300
+            className={`flex flex-col items-center justify-center p-sm rounded-md bg-darkBackground/90 shadow-sm border-1.5 border-transparent z-10 transition-all duration-300 relative
             ${isCurrentTurn ? 'border-accentGold shadow-lg animate-activePulse' : ''}
             ${penalties[position] > 0 ? 'opacity-70' : ''}
             ${className || ''}`}
         >
             {error && <div className="text-error text-sm font-bold mb-sm">{error}</div>}
 
-            <div className="flex flex-col items-center w-full">
+            {isCurrentTurn && (
+                <div className="absolute top-0 right-0 -mt-2 -mr-2 bg-accentGold text-darkText text-xs font-bold px-2 py-1 rounded-full z-20 shadow-md">
+                    Current Turn
+                </div>
+            )}
+            <div className="flex flex-col items-center w-full p-2 rounded-lg shadow-md bg-gray-800/70 border border-gray-700">
                 <MemoizedPlayerInfo
                     player={player}
                     isActive={isCurrentTurn}
@@ -172,7 +177,7 @@ const PlayerSection = ({
                 />
             </div>
 
-            <div className="flex flex-col items-center w-full mt-sm">
+            <div className="flex flex-col items-center w-full mt-sm p-2 rounded-lg shadow-md bg-gray-800/70 border border-gray-700">
                 <MemoizedPlayerSpreads
                     key={`spreads-${position}-${gameState?.updateId || 'initial'}`}
                     spreads={safeSpreads}

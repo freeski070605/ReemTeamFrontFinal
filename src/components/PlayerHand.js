@@ -35,7 +35,7 @@ const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selec
     };
 
     return (
-        <div className="flex justify-center items-center w-full max-w-full p-0 overflow-visible relative z-2 min-h-[36px] rounded-lg">
+        <div className="flex justify-center items-center w-full max-w-full p-0 overflow-visible relative z-2 min-h-[140px] rounded-lg pb-8"> {/* Increased min-h and added pb-4 */}
             <div className="flex flex-row flex-nowrap items-center gap-2 w-full min-w-0 max-w-full h-11 m-0 p-0 justify-center overflow-x-auto overscroll-x-contain scrollbar-hide
                             sm:flex-wrap sm:overflow-x-hidden sm:h-auto sm:gap-3
                             lg:flex-nowrap lg:overflow-x-visible lg:h-11 lg:gap-2">
@@ -44,7 +44,7 @@ const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selec
                     const spread = Math.min(90, total * 12);
                     const start = -spread / 2;
                     const angle = start + (i * (spread / (total - 1 || 1)));
-                    const curve = Math.abs(angle) * 0.7;
+                    const curve = Math.abs(angle) * 0.3; // Reduced curve effect
                     const filenameRank = rankToFilenameMap[card.rank] || card.rank;
 
                     const cardClasses = `
@@ -61,10 +61,6 @@ const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selec
                             className={cardClasses}
                             style={{
                                 transform: `rotate(${angle}deg) translateY(${curve}px)`,
-                                // Override for mobile/tablet to prevent fanning
-                                '@media (max-width: 1024px)': {
-                                    transform: 'none !important',
-                                },
                             }}
                             onClick={() => handleCardInteraction(card.originalIndex)}
                         >
