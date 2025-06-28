@@ -74,7 +74,7 @@ body {
     color: var(--light-text);
     transition: padding-top 0.3s ease;
     position: relative;
-    padding-bottom: 0;
+    padding-bottom: 100px; /* Ensure space for the fixed footer on desktop */
 }
 
 .table-header {
@@ -336,7 +336,7 @@ body {
     justify-content: center;
     align-items: center;
     position: relative;
-    overflow: visible; /* Allow game board elements to overflow */
+    overflow-y: auto; /* Enable vertical scrolling for game board content */
 }
 
 /* Tablet (769px – 1024px) */
@@ -359,7 +359,7 @@ body {
 /* Mobile (≤ 768px) */
 @media (max-width: 768px) {
     .table-wrapper {
-        padding-bottom: 0; /* Footer is sticky, no extra padding needed */
+        padding-bottom: 60px; /* Ensure space for the fixed footer on mobile */
     }
     .table-header h2 {
         font-size: var(--font-size-md);
