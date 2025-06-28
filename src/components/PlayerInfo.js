@@ -23,7 +23,7 @@ const PlayerInfo = ({ player = {}, isActive = false, handScore = null }) => {
     }, [player.username, player.chips, user?.username]);
 
     return (
-        <div className={`bg-darkBackground/60 text-accentGold font-bold p-2 px-3 rounded-lg text-center shadow-sm
+        <div className={`bg-darkBackground/60 text-accentGold font-bold p-1 px-2 rounded-lg text-center shadow-sm w-32
                         ${isActive ? 'border-2 border-accentGold animate-pulse' : ''}`}>
             <div className="text-lg">{player.username || 'Player'}</div>
             <div className="flex items-center justify-center text-lightText text-md mt-1">

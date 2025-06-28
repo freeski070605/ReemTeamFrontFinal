@@ -35,10 +35,10 @@ const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selec
     };
 
     return (
-        <div className="flex justify-center items-center w-full max-w-full p-0 overflow-visible relative z-2 min-h-[180px] rounded-lg pb-8"> {/* Increased min-h and added pb-4 */}
+        <div className="flex justify-center items-center w-full max-w-full p-0 overflow-visible relative z-2 min-h-[200px] rounded-lg pb-8"> {/* Increased min-h and added pb-4 */}
             <div className="flex flex-row flex-nowrap items-center gap-2 w-full min-w-0 max-w-full h-auto m-0 p-0 justify-center overflow-x-auto overscroll-x-contain scrollbar-hide
                             sm:flex-wrap sm:overflow-x-hidden sm:h-auto sm:gap-3
-                            lg:flex-nowrap lg:overflow-x-visible lg:h-auto lg:gap-2">
+                            lg:flex-nowrap lg:overflow-x-visible lg:h-auto lg:gap-2 w-full max-w-full">
                 {sortedCards.map((card, i) => {
                     const total = sortedCards.length;
                     const spread = Math.min(90, total * 12);
