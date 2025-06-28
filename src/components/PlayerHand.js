@@ -13,9 +13,9 @@ const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selec
     const sortedCards = cards
         .map((card, originalIndex) => ({ ...card, originalIndex }))
         .sort((a, b) => {
-            const suitDiff = suitOrder.indexOf(a.suit) - suitOrder.indexOf(b.suit);
-            if (suitDiff !== 0) return suitDiff;
-            return rankOrder.indexOf(a.rank) - rankOrder.indexOf(b.rank);
+            const rankDiff = rankOrder.indexOf(a.rank) - rankOrder.indexOf(b.rank);
+            if (rankDiff !== 0) return rankDiff;
+            return suitOrder.indexOf(a.suit) - suitOrder.indexOf(b.suit);
         });
 
     const handleCardInteraction = (originalIndex) => {

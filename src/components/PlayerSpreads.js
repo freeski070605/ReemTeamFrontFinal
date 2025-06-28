@@ -63,7 +63,7 @@ const PlayerSpreads = ({
                       {spread.map((card, cardIndex) => (
                           <div
                               key={`${card.rank}-${card.suit}-${cardIndex}`}
-                              className="w-10 max-w-16 min-w-7 relative rounded-md shadow-sm"
+                              className="w-16 max-w-[90px] min-w-12 relative rounded-md shadow-sm"
                           >
                               <img
                                   src={`${process.env.PUBLIC_URL}/assets/cards/${card.rank}_of_${card.suit}.png`}

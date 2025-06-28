@@ -23,7 +23,7 @@ const Deck = ({ cards, drawCard, isActive, className }) => {
                     <img
                         src={`${process.env.PUBLIC_URL}/assets/cards/back.png`}
                         alt="Deck"
-                        className="w-full h-full object-contain rounded-md"
+                        className={`w-full h-full object-contain rounded-md ${className}`}
                     />
                     <div className="absolute bottom-1 right-1 bg-darkBackground/80 text-lightText text-xs font-bold rounded-full px-2 py-0.5">
                         {cards.length}
@@ -43,10 +43,12 @@ Deck.propTypes = {
     drawCard: PropTypes.func.isRequired,
     isActive: PropTypes.bool,
     className: PropTypes.string,
+    cardSizeClass: PropTypes.string,
 };
 
 Deck.defaultProps = {
     className: '',
+    cardSizeClass: 'w-16 aspect-[2.5/3.5]', // Default to a common card size
 };
 
 export default Deck;

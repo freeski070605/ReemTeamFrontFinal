@@ -44,6 +44,7 @@ const CenterGameArea = ({
                     className="w-16 aspect-[2.5/3.5] rounded-md bg-cardBackground shadow-sm border-1.5 border-primary transition-all duration-200
                                 sm:w-20 sm:rounded-lg
                                 lg:w-24 lg:rounded-xl"
+                    cardSizeClass="w-16 max-w-[90px] min-w-12"
                 />
 
                 <GameInfo
@@ -62,6 +63,7 @@ const CenterGameArea = ({
                     className="w-16 aspect-[2.5/3.5] rounded-md bg-cardBackground shadow-sm border-1.5 border-primary transition-all duration-200
                                 sm:w-20 sm:rounded-lg
                                 lg:w-24 lg:rounded-xl"
+                    cardSizeClass="w-16 max-w-[90px] min-w-12"
                 />
             </div>
 

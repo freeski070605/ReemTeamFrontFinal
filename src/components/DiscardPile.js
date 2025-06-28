@@ -25,7 +25,7 @@ const DiscardPile = ({ cards, onClick, isActive, className }) => {
                     <img
                         src={`${process.env.PUBLIC_URL}/assets/cards/${topCard.rank}_of_${topCard.suit}.png`}
                         alt={`${topCard.rank} of ${topCard.suit}`}
-                        className="w-full h-full object-contain rounded-md shadow-md"
+                        className={`w-full h-full object-contain rounded-md shadow-md ${cardSizeClass}`}
                     />
                 </div>
             )}
@@ -37,7 +37,13 @@ DiscardPile.propTypes = {
     cards: PropTypes.array.isRequired,
     onClick: PropTypes.func,
     isActive: PropTypes.bool,
-    className: PropTypes.string
+    className: PropTypes.string,
+    cardSizeClass: PropTypes.string,
+};
+
+DiscardPile.defaultProps = {
+    className: '',
+    cardSizeClass: 'w-16 aspect-[2.5/3.5]', // Default to a common card size
 };
 
 export default DiscardPile;
