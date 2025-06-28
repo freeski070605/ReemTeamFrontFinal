@@ -26,6 +26,8 @@
     padding: 5px;
     box-sizing: border-box;
     max-width: none; /* Remove max-width in landscape */
+    transform: scale(0.8); /* Zoom out everything */
+    transform-origin: center center; /* Ensure it scales from the center */
   }
 
   .player-section-current {
