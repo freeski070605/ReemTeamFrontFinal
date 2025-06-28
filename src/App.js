@@ -13,6 +13,17 @@ import Header from './components/Header';
 import Rules from './components/Rules';
 
 const App = () => {
+  const isMobile = window.innerWidth <= 768;
+  const isPortrait = window.innerHeight > window.innerWidth;
+
+  if (isMobile && isPortrait) {
+    return (
+      <div className="orientation-message">
+        Please rotate your device to landscape mode for the best experience.
+      </div>
+    );
+  }
+
   return (
     <UserProvider>
       <SocketProvider>

@@ -795,6 +795,8 @@ body {
   font-weight: 500;
   border-radius: 8px;
   transition: background 0.2s;
+  cursor: pointer; /* Ensure cursor indicates clickable */
+  touch-action: manipulation; /* Optimize for touch interactions */
 }
 
 .action-button.discard {
