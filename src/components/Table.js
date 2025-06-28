@@ -416,7 +416,7 @@ const TableComponent = () => {
             <button
               className="leave-button"
               onClick={leaveTable}
-              disabled={!isConnected && !manualLeave}
+              disabled={!isConnected && gameState.hasDrawnCard}
             >
               Leave Table
             </button>
