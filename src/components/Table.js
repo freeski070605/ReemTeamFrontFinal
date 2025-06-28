@@ -367,7 +367,7 @@ const TableComponent = () => {
           )}
 
           {/* Gameboard is fully contained and never covered */}
-          <div className="game-board-container" style={{ width: '100%', height: '100%', position: 'relative', zIndex: 1 }}>
+          <div className="table-content" style={{ width: '100%', height: '100%', position: 'relative', zIndex: 1 }}>
             <GameBoard
               tableId={tableId}
               gameState={gameState}
@@ -378,8 +378,8 @@ const TableComponent = () => {
           </div>
           
 
-          {/* Footer is visually attached but never covers the gameboard */}
-          <div className="footer-bar" style={{ zIndex: 2 }}>
+          {/* Indicators and Leave Button */}
+          <div className="game-indicators-and-actions">
             <div className={`connection-status ${gameState.connectionStatus || (isConnected ? 'connected' : 'disconnected')}`}>
               {connectionStatus}
             </div>
@@ -416,7 +416,7 @@ const TableComponent = () => {
             <button
               className="leave-button"
               onClick={leaveTable}
-              disabled={!isConnected && gameState.hasDrawnCard}
+              disabled={!isConnected && !manualLeave}
             >
               Leave Table
             </button>

@@ -74,7 +74,7 @@ body {
     color: var(--light-text);
     transition: padding-top 0.3s ease;
     position: relative;
-    padding-bottom: 100px; /* Ensure space for the fixed footer on desktop */
+    padding-bottom: 0;
 }
 
 .table-header {
@@ -130,25 +130,24 @@ body {
 }
 
 /* Footer bar layout */
-/* Sticky bottom HUD for mobile/desktop */
-.footer-bar {
-    display: grid;
-    grid-template-columns: auto 1fr auto; /* Connection status | Status/Ready Button | Leave Button */
+/* Game indicators and actions container */
+.game-indicators-and-actions {
+    position: absolute; /* Position relative to .table-wrapper */
+    bottom: var(--spacing-md); /* Adjust as needed */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    justify-content: center;
     align-items: center;
-    gap: var(--spacing-lg);
-    padding: var(--spacing-md) var(--spacing-xl);
-    background: rgba(24, 26, 32, 0.92);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    width: 100%;
-    box-sizing: border-box;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    z-index: 100;
-    min-height: 60px;
-    max-height: 90px;
-    backdrop-filter: blur(6px);
-    transition: background 0.3s;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: rgba(24, 26, 32, 0.8); /* Slightly transparent background */
+    border-radius: var(--border-radius-xxl); /* Rounded corners */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    z-index: 100; /* Ensure it's above the game board */
+    backdrop-filter: blur(8px); /* Frosted glass effect */
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Ready button and status styles */
@@ -330,7 +329,7 @@ body {
 .game-board-container {
     max-width: 1600px;
     width: 100%;
-    height: calc(100vh - 110px); /* Adjusted for new footer height */
+    height: calc(100vh - 60px); /* Adjusted for header only, assuming header is ~60px */
     margin: 0 auto;
     display: flex;
     justify-content: center;
@@ -345,10 +344,9 @@ body {
         height: calc(100vh - 90px); /* Adjusted for new footer height */
         max-width: 960px;
     }
-    .footer-bar {
+    .game-indicators-and-actions {
         padding: var(--spacing-md) var(--spacing-lg);
         gap: var(--spacing-md);
-        grid-template-columns: 1fr 2fr 1fr; /* Adjust grid for tablet */
     }
     .ready-button, .ready-status, .leave-button, .connection-status, .waiting-status {
         font-size: var(--font-size-md);
@@ -359,26 +357,26 @@ body {
 /* Mobile (≤ 768px) */
 @media (max-width: 768px) {
     .table-wrapper {
-        padding-bottom: 60px; /* Ensure space for the fixed footer on mobile */
+        padding-bottom: 0; /* Remove padding as footer is removed */
     }
     .table-header h2 {
         font-size: var(--font-size-md);
     }
     .game-board-container {
-        height: calc(100vh - 120px); /* Adjusted for header (approx 60px) + footer (approx 60px) */
+        height: auto; /* Allow height to adjust to content */
         min-height: unset;
         max-width: 100%;
         padding: 0;
         margin: 0;
         border-radius: var(--border-radius-md);
-        overflow-y: auto; /* Enable scrolling for content within the game board */
-        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        overflow-y: visible; /* Revert to visible, GameBoard will handle its own scrolling */
+        -webkit-overflow-scrolling: auto;
     }
-    .footer-bar {
-        grid-template-columns: 1fr; /* Stack items vertically on mobile */
+    .game-indicators-and-actions {
+        flex-direction: column; /* Stack items vertically on mobile */
         gap: var(--spacing-sm);
         padding: var(--spacing-sm) var(--spacing-md);
-        min-height: 52px;
+        min-width: 90%; /* Take up more width on mobile */
     }
     .ready-button, .ready-status, .leave-button, .connection-status, .waiting-status {
         width: 100%;
