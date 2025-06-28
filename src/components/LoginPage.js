@@ -74,38 +74,63 @@ const LoginPage = ({ handleLogin, onClose }) => {
   
   
   return (
-    <Modal isOpen={modalIsOpen} onRequestClose={closeModal} shouldCloseOnOverlayClick={true}  appElement={document.getElementById('root')}>
-      <h2>{isRegistering ? 'Register' : 'Login'}</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-        {isRegistering && (
+    <Modal
+      isOpen={modalIsOpen}
+      onRequestClose={closeModal}
+      shouldCloseOnOverlayClick={true}
+      appElement={document.getElementById('root')}
+      className="flex items-center justify-center p-4"
+      overlayClassName="fixed inset-0 bg-darkBackground bg-opacity-75 flex items-center justify-center z-overlay"
+    >
+      <div className="bg-darkBackground p-md rounded-md shadow-lg max-w-md w-full border border-borderColor">
+        <h2 className="text-lightText text-xl font-bold mb-lg text-center">
+          {isRegistering ? 'Register' : 'Login'}
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-md">
           <input
-            type="email"
-            placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        )}
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">{isRegistering ? 'Register' : 'Login'}</button>
-        <button type="button" onClick={() => setIsRegistering(!isRegistering)}>
-          {isRegistering ? 'Switch to Login' : 'Switch to Register'}
-        </button>
-        {errorMessage && <p className="error-message">{errorMessage}</p>}
-      </form>
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+            className="w-full p-sm rounded-sm bg-gray-700 text-lightText placeholder-gray-400 border border-borderColor focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+          {isRegistering && (
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full p-sm rounded-sm bg-gray-700 text-lightText placeholder-gray-400 border border-borderColor focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          )}
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full p-sm rounded-sm bg-gray-700 text-lightText placeholder-gray-400 border border-borderColor focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+          <button
+            type="submit"
+            className="w-full bg-primary text-lightText p-sm rounded-sm font-semibold hover:bg-buttonHover transition-colors duration-200"
+          >
+            {isRegistering ? 'Register' : 'Login'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsRegistering(!isRegistering)}
+            className="w-full bg-gray-600 text-lightText p-sm rounded-sm font-semibold hover:bg-gray-700 transition-colors duration-200 mt-sm"
+          >
+            {isRegistering ? 'Switch to Login' : 'Switch to Register'}
+          </button>
+          {errorMessage && (
+            <p className="text-error text-sm text-center mt-md">{errorMessage}</p>
+          )}
+        </form>
+      </div>
     </Modal>
   );
 };
