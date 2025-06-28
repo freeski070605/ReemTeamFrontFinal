@@ -554,44 +554,9 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                             isCurrentPlayer={true}
                             totalPlayers={reorderedPlayers.length}
                             isSpectator={isSpectator}
-                            showActions={false} // Actions are separate for mobile
+                            showActions={showPlayerActions} // Show actions for the current player
                         />
 
-                        {showPlayerActions && (
-                            <div className="mobile-actions-container flex flex-row flex-wrap justify-center gap-sm w-full p-sm box-border mt-md">
-                                <button
-                                    className={`action-button drop flex-1 max-w-[48%] p-md text-lg h-[60px] rounded-md bg-success text-lightText font-bold transition-colors duration-200
-                                                ${!gameState.hasDrawnCard && currentPlayerObject?.hitPenaltyRounds === 0 ? 'opacity-100' : 'opacity-50 cursor-not-allowed'}`}
-                                    disabled={gameState.hasDrawnCard || currentPlayerObject?.hitPenaltyRounds > 0}
-                                    onClick={handleDrop}
-                                >
-                                    Drop {currentPlayerObject?.hitPenaltyRounds > 0 ? `(${currentPlayerObject?.hitPenaltyRounds})` : ''}
-                                </button>
-                                <button
-                                    className={`action-button spread flex-1 max-w-[48%] p-md text-lg h-[60px] rounded-md bg-primary text-lightText font-bold transition-colors duration-200
-                                                ${gameState.hasDrawnCard && !gameState.isProcessingAction ? 'opacity-100' : 'opacity-50 cursor-not-allowed'}`}
-                                    disabled={!gameState.hasDrawnCard || gameState.isProcessingAction}
-                                    onClick={() => handleSpread(reorderedHands[0])}
-                                >
-                                    {gameState.isProcessingAction ? 'Processing...' : 'Spread'}
-                                </button>
-                                <button
-                                    className={`action-button hit flex-1 max-w-[48%] p-md text-lg h-[60px] rounded-md bg-info text-lightText font-bold transition-colors duration-200
-                                                ${hitMode ? 'bg-secondary' : ''} ${!gameState.hasDrawnCard ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}`}
-                                    onClick={toggleHitMode}
-                                    disabled={!gameState.hasDrawnCard}
-                                >
-                                    Hit
-                                </button>
-                                <button
-                                    className="action-button cancel flex-1 max-w-[48%] p-md text-lg h-[60px] rounded-md bg-accentRed text-lightText font-bold transition-colors duration-200"
-                                    onClick={toggleHitMode}
-                                    disabled={!hitMode}
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        )}
                     </div>
 
                     {/* Tablet & Desktop Layout */}

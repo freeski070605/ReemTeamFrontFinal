@@ -365,12 +365,14 @@ body {
         font-size: var(--font-size-md);
     }
     .game-board-container {
-        height: auto; /* Allow height to adjust to content */
+        height: calc(100vh - 120px); /* Adjusted for header (approx 60px) + footer (approx 60px) */
         min-height: unset;
         max-width: 100%;
         padding: 0;
         margin: 0;
         border-radius: var(--border-radius-md);
+        overflow-y: auto; /* Enable scrolling for content within the game board */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
     .footer-bar {
         grid-template-columns: 1fr; /* Stack items vertically on mobile */
