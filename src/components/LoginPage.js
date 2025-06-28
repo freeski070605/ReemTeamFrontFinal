@@ -59,7 +59,7 @@ const LoginPage = ({ handleLogin, onClose }) => {
         setUser(response.user);
         handleLogin(username, password);
         closeModal();
-        navigate('/userprofile');
+        navigate('/userprofile'); // Navigate after state is set and local storage is updated
 
         // Dispatch custom event after successful login and token/userId storage
         window.dispatchEvent(new Event('loginSuccess'));

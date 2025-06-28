@@ -50,9 +50,10 @@ const AuthService = {
 
   logout: async () => {
     try {
-      await axiosInstance.post(`${API_URL}/users/logout`);
-      console.log('Logout successful');
-      redirect('/');
+      const response = await axiosInstance.post(`${API_URL}/users/logout`);
+      console.log('Logout successful', response.data);
+      clearAuthState(); // Clear local and session storage
+      window.location.href = '/'; // Use window.location.href for a full page reload and redirect
     } catch (error) {
       console.error('Logout error:', error);
       throw new Error('Failed to logout. Please try again.');

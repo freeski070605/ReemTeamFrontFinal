@@ -16,7 +16,7 @@ export const UserProvider = ({ children }) => {
                     if (response && response.success && response.user) {
                         setUser(response.user);
                     } else {
-                        console.warn('Token invalid or expired, clearing user data.');
+                        console.warn('AuthService.getCurrentUser failed, clearing user data.');
                         localStorage.removeItem('token');
                         localStorage.removeItem('userId');
                         setUser(null);
