@@ -160,6 +160,7 @@ const PlayerSection = ({
                     player={player}
                     isActive={isCurrentTurn}
                     className="mb-sm"
+                    handScore={isCurrentPlayer ? calculatePoints(safeHand) : null}
                 />
 
                 <MemoizedPlayerHand
