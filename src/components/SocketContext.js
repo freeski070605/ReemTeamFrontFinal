@@ -76,7 +76,6 @@ export const SocketProvider = ({ children }) => {
     }, 30000);
 
     return () => {
-      newSocket.disconnect();
       clearInterval(heartbeat);
     };
   }, [currentUserId, currentToken]); // Dependencies for re-running the effect
