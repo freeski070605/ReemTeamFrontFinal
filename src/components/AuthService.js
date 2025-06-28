@@ -50,7 +50,7 @@ const AuthService = {
 
   logout: async () => {
     try {
-      await axiosInstance.post(`$${API_URL}/users/logout`);
+      await axiosInstance.post(`${API_URL}/users/logout`);
       console.log('Logout successful');
       redirect('/');
     } catch (error) {
