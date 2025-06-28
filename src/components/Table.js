@@ -364,44 +364,15 @@ const TableComponent = () => {
                 )}
               </div>
             </div>
-          )}
-
-          {/* Gameboard is fully contained and never covered */}
-          <div className="table-content" style={{ width: '100%', height: '100%', position: 'relative', zIndex: 1 }}>
-            <GameBoard
-              tableId={tableId}
-              gameState={gameState}
-              setGameState={setGameState}
-              socket={socket}
-              user={user}
-            />
-          </div>
+          )} 
           
-
           {/* Indicators and Leave Button */}
-          <div className="game-indicators-and-actions">
+          {/* <div className="game-indicators-and-actions"> */}
             <div className={`connection-status ${gameState.connectionStatus || (isConnected ? 'connected' : 'disconnected')}`}>
               {connectionStatus}
             </div>
             
-            {/* Show ready button only if game has ended (not for waiting tables) */}
-            {gameState.gameOver && isPlayerSeated && !Array.from(gameState.readyPlayers || []).includes(user?.username) && (
-              <button
-                className="ready-button"
-                onClick={handlePlayerReady}
-                disabled={!isConnected}
-              >
-                Ready for Next Hand
-              </button>
-            )}
-            
-            {/* Show ready status if player is ready for next hand */}
-            {gameState.gameOver && Array.from(gameState.readyPlayers || []).includes(user?.username) && (
-              <div className="ready-status">
-                ✓ Ready ({Array.from(gameState.readyPlayers || []).length}/{gameState.players?.filter(p => p.isHuman).length || 0})
-              </div>
-            )}
-            
+           
             {/* Show waiting message with countdown for new tables */}
             {!gameState.gameStarted && !gameState.gameOver && isPlayerSeated && (
               <div className="waiting-status">
@@ -416,11 +387,25 @@ const TableComponent = () => {
             <button
               className="leave-button"
               onClick={leaveTable}
-              disabled={!isConnected && !manualLeave}
+              disabled={gameState.hasDrawnCard}
             >
               Leave Table
             </button>
+          {/* </div> */}
+
+          {/* Gameboard is fully contained and never covered */}
+          <div className="table-content" style={{ width: '100%', height: '100%', position: 'relative', zIndex: 1 }}>
+            <GameBoard
+              tableId={tableId}
+              gameState={gameState}
+              setGameState={setGameState}
+              socket={socket}
+              user={user}
+            />
           </div>
+          
+
+         
         </div>
       </GameErrorBoundary>
     </GameContext.Provider>
