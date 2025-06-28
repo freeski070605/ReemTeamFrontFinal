@@ -367,7 +367,7 @@ const TableComponent = () => {
           )}
 
           {/* Gameboard is fully contained and never covered */}
-          <div className="table-content" style={{ width: '100%', height: '100%', position: 'relative', zIndex: 1 }}>
+          <div className="game-board-container" style={{ width: '100%', height: '100%', position: 'relative', zIndex: 1 }}>
             <GameBoard
               tableId={tableId}
               gameState={gameState}

@@ -90,23 +90,6 @@ body {
     text-shadow: 0 2px 10px rgba(255, 215, 0, 0.2);
 }
 
-.game-board {
-    max-width: 1600px;
-    width: 100%;
-    min-height: 600px;
-    height: calc(100vh - 120px);
-    overflow: visible;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: var(--border-radius-xl);
-    background: var(--gradient-table);
-    box-shadow: 0 0 40px var(--shadow-medium);
-    margin: 0 auto;
-    position: relative;
-    padding: 0 16px;
-    transition: background 0.3s;
-}
 
 
 /* Transition banner */
@@ -335,35 +318,60 @@ body {
 }
 
 /* Responsive Adjustments */
-@media (max-width: 1200px) {
-    .game-board {
-        height: calc(100vh - 100px);
+/* Responsive Adjustments */
+
+/* Desktop (≥ 1025px) - Default styles already largely cover this */
+.game-board-container {
+    max-width: 1600px;
+    width: 100%;
+    height: calc(100vh - 120px); /* Adjust for footer */
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: visible; /* Allow game board elements to overflow */
+}
+
+/* Tablet (769px – 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .game-board-container {
+        height: calc(100vh - 100px); /* Adjust for footer */
+        max-width: 960px;
+    }
+    .footer-bar {
+        padding: var(--spacing-md) var(--spacing-lg);
+        gap: var(--spacing-md);
+        flex-direction: row;
+        justify-content: space-around;
+    }
+    .ready-button, .ready-status, .leave-button, .connection-status, .waiting-status {
+        font-size: var(--font-size-md);
+        padding: 12px 20px;
     }
 }
 
-@media (max-width: 900px) {
-    .game-board {
-        min-height: 400px;
-        height: auto;
-        padding: 0 4px;
+/* Mobile (≤ 768px) */
+@media (max-width: 768px) {
+    .table-wrapper {
+        padding-bottom: 0; /* Footer is sticky, no extra padding needed */
+    }
+    .table-header h2 {
+        font-size: var(--font-size-md);
+    }
+    .game-board-container {
+        height: auto; /* Allow height to adjust to content */
+        min-height: unset;
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+        border-radius: var(--border-radius-md);
     }
     .footer-bar {
         flex-direction: column;
         gap: var(--spacing-sm);
         padding: var(--spacing-sm) var(--spacing-md);
         min-height: 56px;
-    }
-}
-
-@media (max-width: 600px) {
-    .table-header h2 {
-        font-size: var(--font-size-md);
-    }
-    .footer-bar {
-        flex-direction: column;
-        gap: var(--spacing-xs);
-        padding: var(--spacing-xs) var(--spacing-sm);
-        min-height: 48px;
     }
     .ready-button, .ready-status, .leave-button, .connection-status, .waiting-status {
         width: 100%;
@@ -376,10 +384,5 @@ body {
         font-size: var(--font-size-sm);
         flex-direction: column;
         gap: 3px;
-    }
-    .game-board {
-        border-radius: var(--border-radius-md);
-        margin: var(--spacing-xs) auto;
-        height: auto;
     }
 }
