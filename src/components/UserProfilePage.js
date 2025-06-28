@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { UserContext } from './UserContext';
 import CasinoChip from '../utils/casinoChip';
+import '../styles/tailwind.css'; // Ensure Tailwind is imported globally or in index.js
 
 const UserProfilePage = () => {
   const { user, isLoading, updateUserChips } = useContext(UserContext);
@@ -68,8 +69,8 @@ const UserProfilePage = () => {
 
   if (loading || !user) {
     return (
-      <div className="profile-container">
-        <div className="loading-spinner">Loading profile data...</div>
+      <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center">
+        <div className="text-xl text-blue-400">Loading profile data...</div>
       </div>
     );
   }
@@ -91,74 +92,79 @@ const UserProfilePage = () => {
   
 
   return (
-    <div className="profile-container">
-      <main className="content">
-        <div className="profile-header">
-          <h1>Welcome back, {user.username}!</h1>
-          <div className="chips-display">
-            <span className="chip-icon"><CasinoChip /></span>
-            <span className="chip-amount">{user.chips}</span>
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 sm:p-8">
+      <main className="max-w-6xl mx-auto bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 p-6 bg-gradient-to-r from-blue-600 to-teal-500 rounded-xl shadow-lg relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-pattern opacity-10"></div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 sm:mb-0 relative z-10">Welcome back, {user.username}!</h1>
+          <div className="flex items-center space-x-3 bg-white bg-opacity-20 rounded-full px-5 py-2 shadow-md relative z-10">
+            <span className="text-3xl text-yellow-300"><CasinoChip /></span>
+            <span className="text-2xl font-bold text-white">{user.chips}</span>
           </div>
         </div>
 
-        <div className="profile-grid">
-          <section className="stats-card">
-            <h2>Player Statistics</h2>
-            <div className="stats-grid">
-              <div className="stat-item">
-                <h3>Games Played</h3>
-                <p>{stats.gamesPlayed}</p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <section className="lg:col-span-2 bg-gray-700 rounded-lg shadow-md p-6">
+            <h2 className="text-2xl font-semibold text-blue-400 mb-5 pb-3 border-b border-gray-600">Player Statistics</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-gray-600 rounded-lg p-5 text-center shadow-inner">
+                <h3 className="text-lg font-medium text-gray-300 mb-2">Games Played</h3>
+                <p className="text-3xl font-bold text-teal-400">{stats.gamesPlayed}</p>
               </div>
-              <div className="stat-item">
-                <h3>Wins</h3>
-                <p>{stats.wins}</p>
+              <div className="bg-gray-600 rounded-lg p-5 text-center shadow-inner">
+                <h3 className="text-lg font-medium text-gray-300 mb-2">Wins</h3>
+                <p className="text-3xl font-bold text-green-400">{stats.wins}</p>
               </div>
-              <div className="stat-item">
-                <h3>REEM Wins</h3>
-                <p>{stats.reemWins}</p>
+              <div className="bg-gray-600 rounded-lg p-5 text-center shadow-inner">
+                <h3 className="text-lg font-medium text-gray-300 mb-2">REEM Wins</h3>
+                <p className="text-3xl font-bold text-purple-400">{stats.reemWins}</p>
               </div>
-              <div className="stat-item">
-                <h3>Total Earnings</h3>
-                <p>${stats.totalEarnings}</p>
+              <div className="bg-gray-600 rounded-lg p-5 text-center shadow-inner">
+                <h3 className="text-lg font-medium text-gray-300 mb-2">Total Earnings</h3>
+                <p className="text-3xl font-bold text-yellow-400">${stats.totalEarnings}</p>
               </div>
             </div>
           </section>
 
-          <section className="chips-card">
-            <h2>Buy Chips</h2>
-            <div className="chips-options">
-            {[1000, 5000, 10000, 50000].map(amount => (
-              <button 
-                key={amount}
-                onClick={() => handleBuyChips(amount)}
-                disabled={loading}
-                className="chip-buy-button"
-              >
-                Buy {amount} <CasinoChip />
-              </button>
-            ))}
-          </div>
-            {feedbackMessage && <p className="feedback">{feedbackMessage}</p>}
-          </section>
-
-          <section className="recent-games">
-            <h2>Recent Games</h2>
-            <div className="games-list">
-            {recentGames.map((game, index) => (
-                <div key={index} className="game-item">
-                  <span className="game-result">{game.result}</span>
-                  <span className="game-stake">${game.earnings}</span>
-                  <span className="game-date">{new Date(game.date).toLocaleDateString()}</span>
-                </div>
+          <section className="bg-gray-700 rounded-lg shadow-md p-6">
+            <h2 className="text-2xl font-semibold text-blue-400 mb-5 pb-3 border-b border-gray-600">Buy Chips</h2>
+            <div className="grid grid-cols-2 gap-4 mt-5">
+              {[1000, 5000, 10000, 50000].map(amount => (
+                <button
+                  key={amount}
+                  onClick={() => handleBuyChips(amount)}
+                  disabled={loading}
+                  className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition duration-300 ease-in-out transform hover:-translate-y-1 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span>Buy {amount}</span> <CasinoChip className="text-xl" />
+                </button>
               ))}
             </div>
+            {feedbackMessage && <p className="mt-5 p-3 bg-blue-800 text-blue-200 rounded-md text-center font-medium">{feedbackMessage}</p>}
           </section>
 
-          <section className="quick-actions">
-            <button className="action-button primary" onClick={() => navigate('/lobby')}>
+          <section className="lg:col-span-3 bg-gray-700 rounded-lg shadow-md p-6">
+            <h2 className="text-2xl font-semibold text-blue-400 mb-5 pb-3 border-b border-gray-600">Recent Games</h2>
+            <div className="space-y-3 mt-5">
+              {recentGames.length > 0 ? (
+                recentGames.map((game, index) => (
+                  <div key={index} className="flex justify-between items-center bg-gray-600 p-4 rounded-lg shadow-sm">
+                    <span className={`font-semibold ${game.result === 'Win' ? 'text-green-400' : 'text-red-400'}`}>{game.result}</span>
+                    <span className="font-medium text-yellow-300">${game.earnings}</span>
+                    <span className="text-sm text-gray-400">{new Date(game.date).toLocaleDateString()}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-400 text-center">No recent games found.</p>
+              )}
+            </div>
+          </section>
+
+          <section className="lg:col-span-3 flex flex-col sm:flex-row justify-center gap-4 bg-gray-700 rounded-lg shadow-md p-6">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:-translate-y-1 shadow-lg" onClick={() => navigate('/lobby')}>
               Play Now
             </button>
-            <button className="action-button secondary" onClick={() => navigate('/leaderboard')}>
+            <button className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:-translate-y-1 shadow-lg" onClick={() => navigate('/leaderboard')}>
               View Leaderboard
             </button>
           </section>
