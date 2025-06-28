@@ -166,10 +166,18 @@ const getWinMessage = () => {
             return `Successful Drop by ${winnerNames}! Wins ${potSize} chips`;
         case 'REEM':
             return `REEM! ${winnerNames} wins ${potSize * 2} chips with two spreads!`;
-        case '50':
+        case 'IMMEDIATE_50_WIN':
             return `${winnerNames} wins ${potSize * 2} chips with a score of 50!`;
-        case '41or11':
-            return `${winnerNames} wins ${potSize * 3} chips with a score of 41 or 11 or under!`;
+            case 'SPECIAL_WIN':
+                // Calculate the winner's actual score to determine if it's 41 or 11-or-under
+                const winnerScore = winners.length > 0 ? calculatePlayerScore(winners[0]) : 0;
+                if (winnerScore === 41) {
+                    return `${winnerNames} wins ${potSize * 3} chips with a perfect score of 41!`;
+                } else if (winnerScore === 11) {
+                    return `${winnerNames} wins ${potSize * 3} chips with a score of exactly 11!`;
+                } else if (winnerScore < 11) {
+                    return `${winnerNames} wins ${potSize * 3} chips with a score of ${winnerScore} (under 11)!`;
+                }
         case 'STOCK_EMPTY':
             const isMultipleWinners = winners.length > 1;
             return `Deck Empty - ${winnerNames} ${isMultipleWinners ? 'tie' : 'wins'} with lowest points! ${isMultipleWinners ? `Split pot: ${potSize / winners.length} chips each` : `Wins ${potSize} chips`}`;
