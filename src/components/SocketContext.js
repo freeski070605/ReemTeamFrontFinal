@@ -62,10 +62,10 @@ export const SocketProvider = ({ children }) => {
       setIsConnected(true);
     });
 
-    // newSocket.on('disconnect', () => {
-    //   console.log('⚠️ Socket disconnected');
-    //   setIsConnected(false);
-    // });
+    newSocket.on('disconnect', () => {
+      console.log('⚠️ Socket disconnected');
+      setIsConnected(false);
+    });
 
     newSocket.on('ping', () => setLastPing(Date.now()));
 
@@ -76,10 +76,7 @@ export const SocketProvider = ({ children }) => {
     }, 30000);
 
     return () => {
-      newSocket.on('disconnect', () => {
-        console.log('⚠️ Socket disconnected');
-        setIsConnected(false);
-      });      
+      newSocket.off('disconnect'); // Unregister the disconnect listener
       clearInterval(heartbeat);
     };
   }, [currentUserId, currentToken]); // Dependencies for re-running the effect
