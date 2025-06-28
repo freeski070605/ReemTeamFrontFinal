@@ -1,1 +1,77 @@
+/* ReemTeamFrontFinal/src/components/GameBoard.css */
 
+/* Default mobile layout (portrait) */
+.mobile-game-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 400px; /* Max width for portrait */
+  margin: 0 auto;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* Mobile landscape layout */
+@media (max-width: 768px) and (orientation: landscape) {
+  .mobile-game-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr; /* Left, Center, Right */
+    grid-template-rows: auto 1fr auto; /* Top, Middle, Bottom */
+    gap: 5px;
+    height: 100vh; /* Use full viewport height */
+    width: 100vw; /* Use full viewport width */
+    overflow: hidden; /* Prevent scrolling */
+    padding: 5px;
+    box-sizing: border-box;
+    max-width: none; /* Remove max-width in landscape */
+  }
+
+  .player-section-current {
+    grid-column: 2 / 3;
+    grid-row: 3 / 4;
+    align-self: end;
+    justify-self: center;
+    width: 95%;
+    max-width: 300px;
+  }
+
+  .center-game-area-mobile-landscape {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    align-self: center;
+    justify-self: center;
+    width: 90%;
+    height: 90%;
+    max-width: 250px;
+    max-height: 250px;
+  }
+
+  .player-section-top-mobile-landscape {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    align-self: start;
+    justify-self: center;
+    width: 95%;
+    max-width: 200px;
+  }
+
+  .player-section-left-mobile-landscape {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+    align-self: center;
+    justify-self: start;
+    width: 95%;
+    max-width: 200px;
+  }
+
+  .player-section-right-mobile-landscape {
+    grid-column: 3 / 4;
+    grid-row: 2 / 3;
+    align-self: center;
+    justify-self: end;
+    width: 95%;
+    max-width: 200px;
+  }
+}
