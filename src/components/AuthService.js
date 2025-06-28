@@ -81,16 +81,17 @@ const AuthService = {
  getCurrentUser: async () => {
   try {
     const response = await axiosInstance.get( `${API_URL}/users/profile` );
-    console.log('Get current user response:', response.data);
-    if (response.data && response.data.success) { // Ensure success is true
+    console.log('AuthService.getCurrentUser response:', response.data); // More specific log
+    if (response.data && response.data.success) {
       return { success: true, user: response.data.user };
     }
     // If response.data exists but success is false, or user is missing
+    console.warn('AuthService.getCurrentUser: User data not found or success is false.', response.data); // Log more details
     return { success: false, error: response.data?.message || 'User data not found' };
   } catch (error) {
-    console.error('Get current user error:', error);
+    console.error('AuthService.getCurrentUser error:', error.response?.data || error.message || error); // Log full error
     // Return success: false on any error during the API call
-    return { success: false, error: error.message || 'Failed to fetch current user' };
+    return { success: false, error: error.response?.data?.message || error.message || 'Failed to fetch current user' };
   }
 },
 
