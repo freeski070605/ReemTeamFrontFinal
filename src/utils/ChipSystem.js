@@ -155,7 +155,7 @@ static startNewGame(gameState) {
                             winner.username,
                             pot * 2,
                             localStorage.getItem('token'),
-                            gameState.id,
+                            gameState.sessionId,
                             'REEM Win - Double Stake'
                         );
                     }
@@ -169,7 +169,7 @@ static startNewGame(gameState) {
                                 dropper.username,
                                 -(stake * 2 * validWinners.length),
                                 localStorage.getItem('token'),
-                                gameState.id,
+                                gameState.sessionId,
                                 'Drop Caught - Double Penalty'
                             );
                         }
@@ -182,7 +182,7 @@ static startNewGame(gameState) {
                             winner.username,
                             stake * 2,
                             localStorage.getItem('token'),
-                            gameState.id,
+                            gameState.sessionId,
                             'Drop Caught Win'
                         );
                     }
@@ -197,7 +197,9 @@ static startNewGame(gameState) {
                         await this.updateChips(
                             winner.username,
                             splitAmount,
-                            localStorage.getItem('token')
+                            localStorage.getItem('token'),
+                            gameState.sessionId,
+                            'STOCK_EMPTY Win'
                         );
                     }
                     break;
@@ -210,7 +212,9 @@ static startNewGame(gameState) {
                         await this.updateChips(
                             winner.username,
                             pot,
-                            localStorage.getItem('token')
+                            localStorage.getItem('token'),
+                            gameState.sessionId,
+                            'Regular Win'
                         );
                     }
             }
@@ -255,7 +259,9 @@ static startNewGame(gameState) {
                 await this.updateChips(
                     player.username,
                     stake,
-                    localStorage.getItem('token')
+                    localStorage.getItem('token'),
+                    gameState.sessionId,
+                    'Tie - Stake Returned'
                 );
             }
             return true;
