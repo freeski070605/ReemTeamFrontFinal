@@ -105,17 +105,20 @@
 /* Responsive fallback */
 @media (max-width: 900px) {
   .player-hand-container {
-    min-height: 32px;
+    min-height: 60px; /* Increased min-height for full card visibility */
+    padding-bottom: 10px; /* Add some padding at the bottom */
   }
   .card {
-    width: clamp(32px, 18vw, 60px);
+    width: clamp(45px, 18vw, 70px); /* Slightly larger cards for better visibility */
     border-radius: 8px;
   }
   .cards-wrapper {
     gap: 8px; /* Adjusted gap for mobile */
-    height: clamp(32px, 8vw, 60px);
+    height: auto; /* Allow height to adjust to content */
     transform: none !important;
-    justify-content: flex-start; /* Align cards to start for scrolling */
+    justify-content: center; /* Center cards on mobile */
+    flex-wrap: wrap; /* Allow cards to wrap to next line */
+    overflow-x: hidden; /* Disable horizontal scrolling on mobile */
   }
   .card {
     transform: none !important; /* Remove individual card transforms */

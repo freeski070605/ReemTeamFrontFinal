@@ -3,7 +3,7 @@
 .card,
 .deck img,
 .discard-pile img {
-  width: clamp(65px, 10vw, 90px);
+  width: clamp(55px, 10vw, 90px); /* Slightly reduced min-width for better fit */
   aspect-ratio: 2.5 / 3.5;
   border-radius: 8px;
   object-fit: contain;
