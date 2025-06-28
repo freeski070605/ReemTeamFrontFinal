@@ -18,7 +18,7 @@ import GameEndOverlay from './GameEndOverlay';
 import { LoadingState } from './LoadingState';
 import { GameErrorBoundary } from './GameErrorBoundary';
 import ChipSystem from '../utils/ChipSystem';
-import './Gameboard.css';
+import './GameBoard.css';
 
 
 const GameBoard = ({ tableId, gameState, setGameState, user }) => {
