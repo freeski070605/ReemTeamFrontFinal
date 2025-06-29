@@ -162,13 +162,15 @@ const Lobby = () => {
     };
 
     // Register socket listeners
-    socket.on('tables_update', handleTablesUpdate);
-    socket.on('table_assigned', handleTableAssigned);
-    socket.on('queue_status', handleQueueStatus);
-    socket.on('leave_table_result', handleLeaveTableResult);
-    socket.on('error', handleError);
-    // --- NEW: Listen for spectator_mode_active in the lobby ---
-    socket.on('spectator_mode_active', handleSpectatorModeActive);
+    if (socket) {
+      socket.on('tables_update', handleTablesUpdate);
+      socket.on('table_assigned', handleTableAssigned);
+      socket.on('queue_status', handleQueueStatus);
+      socket.on('leave_table_result', handleLeaveTableResult);
+      socket.on('error', handleError);
+      // --- NEW: Listen for spectator_mode_active in the lobby ---
+      socket.on('spectator_mode_active', handleSpectatorModeActive);
+    }
 
     // Refresh tables when tab becomes visible
     document.addEventListener('visibilitychange', () => {
@@ -176,26 +178,39 @@ const Lobby = () => {
     });
 
     return () => {
-      socket.off('tables_update', handleTablesUpdate);
-      socket.off('table_assigned', handleTableAssigned);
-      socket.off('queue_status', handleQueueStatus);
-      socket.off('leave_table_result', handleLeaveTableResult);
-      socket.off('error', handleError);
-      // --- NEW: Unregister spectator_mode_active handler ---
-      socket.off('spectator_mode_active', handleSpectatorModeActive);
+      if (socket) {
+        socket.off('tables_update', handleTablesUpdate);
+        socket.off('table_assigned', handleTableAssigned);
+        socket.off('queue_status', handleQueueStatus);
+        socket.off('leave_table_result', handleLeaveTableResult);
+        socket.off('error', handleError);
+        // --- NEW: Unregister spectator_mode_active handler ---
+        socket.off('spectator_mode_active', handleSpectatorModeActive);
+      }
       document.removeEventListener('visibilitychange', fetchTables);
     };
-  }, [navigate, fetchTables]);
+  }, [navigate, fetchTables, user, isLoading]); // Added user and isLoading to dependencies
+
+  // Redirect if user is not logged in and loading is complete
+  useEffect(() => {
+    if (!isLoading && !user) {
+      console.log('User not logged in, redirecting to home page.');
+      navigate('/');
+    }
+  }, [isLoading, user, navigate]);
 
   if (isLoading) return <div className="loading">Loading...</div>;
+
+  // Only render lobby content if user is logged in
+  if (!user) return null; // Or a more explicit "Please log in" message if desired
 
   return (
     <div className="lobby-container">
       <div className="lobby-header">
         <h1>Reem Team Tonk</h1>
         <div className="user-info">
-          <span>Welcome, {user?.username}</span>
-          <span className="chips">Chips: ${user?.chips || 0}</span>
+          <span>Welcome, {user.username}</span>
+          <span className="chips">Chips: ${user.chips || 0}</span>
         </div>
       </div>
 

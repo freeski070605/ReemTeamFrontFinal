@@ -22,7 +22,7 @@
     gap: 10px; /* Increase gap for better spacing */
     height: 100vh; /* Use full viewport height */
     width: 100vw; /* Use full viewport width */
-    overflow: hidden; /* Prevent scrolling */
+    overflow: auto; /* Enable scrolling for game board content */
     padding: 5px;
     box-sizing: border-box;
     max-width: none; /* Remove max-width in landscape */

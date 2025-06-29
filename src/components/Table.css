@@ -329,22 +329,22 @@ body {
 .game-board-container {
     max-width: 1600px;
     width: 100%;
-    height: calc(100vh - 60px); /* Adjusted for header only, assuming header is ~60px */
+    height: calc(100vh - 160px); /* Adjusted for header and estimated footer height */
     margin: 0 auto;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
-    overflow-y: auto; /* Enable vertical scrolling for game board content */
-    padding-bottom: 120px; /* Add padding to the bottom to make space for the footer */
+    overflow: hidden; /* Prevent scrolling */
+    padding-bottom: 0; /* Remove padding as content should fit */
 }
 
 /* Tablet (769px – 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
     .game-board-container {
-        height: calc(100vh - 90px); /* Adjusted for new footer height */
+        height: calc(100vh - 160px); /* Adjusted for header and estimated footer height */
         max-width: 960px;
-        padding-bottom: 120px; /* Add padding to the bottom to make space for the footer */
+        padding-bottom: 0; /* Remove padding as content should fit */
     }
     .game-indicators-and-actions {
         padding: var(--spacing-md) var(--spacing-lg);
