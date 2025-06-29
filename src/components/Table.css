@@ -429,3 +429,52 @@ body {
         padding: 8px 12px; /* Smaller padding */
     }
 }
+
+.connection-indicator {
+    position: absolute; /* or fixed, depending on desired scroll behavior */
+    bottom: 20px; /* Adjust as needed */
+    right: 20px; /* Adjust as needed */
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: flex-end; /* Align items to the right */
+    gap: 8px; /* Space between status and button */
+    padding: 10px 15px; /* Smaller padding */
+    background: rgba(24, 26, 32, 0.8); /* Slightly transparent background */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 10; /* Lower z-index than game elements if needed */
+}
+
+.connection-indicator .status {
+    /* Existing status styles from Table.js, but without fixed positioning */
+    padding: 6px 12px; /* Smaller padding for status */
+    border-radius: 9999px; /* Full rounded */
+    font-weight: 600;
+}
+
+.connection-indicator .status.connected {
+    color: #86efac; /* text-green-400 */
+    background-color: #1f2937; /* bg-gray-800 */
+}
+
+.connection-indicator .status.disconnected {
+    color: #f87171; /* text-red-400 */
+    background-color: #1f2937; /* bg-gray-800 */
+}
+
+.connection-indicator button {
+    /* Styles for the Return to Lobby button */
+    padding: 6px 12px; /* Smaller padding */
+    background-color: #2563eb; /* bg-blue-600 */
+    color: white;
+    border: none;
+    border-radius: 6px; /* Rounded corners */
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 600; /* font-semibold */
+}
+
+.connection-indicator button:hover {
+    background-color: #1d4ed8; /* hover:bg-blue-700 */
+}
