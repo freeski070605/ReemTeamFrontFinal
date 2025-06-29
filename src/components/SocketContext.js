@@ -1,14 +1,14 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
-import { io } from 'socket.io-client';
+import * as Colyseus from 'colyseus.js';
 
 export const SocketContext = createContext();
 
 export const SocketProvider = ({ children }) => {
-  const [socket, setSocket] = useState(null);
+  const [colyseusClient, setColyseusClient] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [lastPing, setLastPing] = useState(null);
+  // lastPing and currentToken are not directly managed by Colyseus client,
+  // but can be derived from room state or client connection status if needed.
   const [currentUserId, setCurrentUserId] = useState(localStorage.getItem('userId'));
-  const [currentToken, setCurrentToken] = useState(localStorage.getItem('token'))
 
   // Memoize the event handler to ensure stable reference for useEffect cleanup
   const handleLoginSuccess = useCallback(() => {
@@ -29,59 +29,44 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     // Only attempt to connect if currentUserId and currentToken are available
-    if (currentUserId && currentToken) {
-      // Disconnect existing socket before creating a new one if dependencies change
-      if (socket) {
-        socket.disconnect();
+    if (currentUserId) { // Only userId is needed for Colyseus client initialization
+      // Disconnect existing client before creating a new one if dependencies change
+      if (colyseusClient) {
+        colyseusClient.disconnect();
       }
 
-      const socketUrl = process.env.REACT_APP_SOCKET_URL || 'https://reemteamserver.onrender.com';
-      const newSocket = io(socketUrl, {
-        transports: ['websocket', 'polling'],
-        reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000,
-        timeout: 20000,
-        query: { userId: currentUserId, token: currentToken }
-      });
+      const colyseusUrl = process.env.REACT_APP_COLYSEUS_URL || 'ws://localhost:3000'; // Default to localhost
+      console.log(`Attempting to connect to Colyseus at: ${colyseusUrl}`);
+      const newClient = new Colyseus.Client(colyseusUrl);
+      setColyseusClient(newClient);
 
-      setSocket(newSocket);
+      // Colyseus client doesn't have a direct 'connect' event like socket.io.
+      // Connection status is managed by room join/leave.
+      // We'll assume 'connected' once a room is successfully joined.
+      // For now, we can set isConnected to true if the client object exists.
+      setIsConnected(true); // This will be refined when joining rooms
 
-      newSocket.on('connect', () => {
-        console.log('✅ Socket connected');
-        setIsConnected(true);
-      });
-
-      newSocket.on('disconnect', () => {
-        console.log('⚠️ Socket disconnected');
-        setIsConnected(false);
-      });
-
-      newSocket.on('ping', () => setLastPing(Date.now()));
-
-      const heartbeat = setInterval(() => {
-        if (newSocket.connected) {
-          newSocket.emit('ping');
-        }
-      }, 30000);
+      // No direct 'ping' or 'heartbeat' needed for Colyseus client,
+      // as it's handled internally by the transport.
 
       return () => {
-        newSocket.off('disconnect'); // Unregister the disconnect listener
-        clearInterval(heartbeat);
+        // Disconnect the Colyseus client on unmount
+        if (newClient) {
+          newClient.close();
+        }
       };
     } else {
-      console.warn('Missing userId or token in localStorage. Socket connection skipped or disconnected.');
-      // Disconnect existing socket if credentials become invalid or are missing
-      if (socket) {
-        socket.disconnect();
-        setSocket(null);
+      console.warn('Missing userId in localStorage. Colyseus client connection skipped or disconnected.');
+      if (colyseusClient) {
+        colyseusClient.close();
+        setColyseusClient(null);
         setIsConnected(false);
       }
     }
-  }, [currentUserId, currentToken]); // Dependencies for re-running the effect
+  }, [currentUserId]); // Dependency on currentUserId
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected, lastPing }}>
+    <SocketContext.Provider value={{ colyseusClient, isConnected }}>
       {children}
     </SocketContext.Provider>
   );

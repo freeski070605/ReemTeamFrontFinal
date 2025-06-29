@@ -5,6 +5,7 @@ import { SocketProvider } from './components/SocketContext';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './components/Home';
 import GameBoard from './components/Gameboard';
+import PhaserGame from './components/PhaserGame';
 import AiGameboard from './components/AiGameboard';
 import UserProfilePage from './components/UserProfilePage';
 import Lobby from './components/Lobby';
@@ -24,6 +25,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/gameboard" element={<GameBoard />} />
+              <Route path="/phaser-game" element={<PhaserGame />} />
               <Route path="/aigameboard" element={<AiGameboard />} />
               <Route path="/userprofile" element={<UserProfilePage />} />
               <Route path="/lobby" element={<Lobby />} />

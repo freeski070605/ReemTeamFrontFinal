@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback,  } from 'react';
+import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -7,6 +7,7 @@ import { UserContext } from './UserContext';
 import { SocketContext } from './SocketContext';
 import './Lobby.css';
 import CreateTableModal from './createTableModal';
+import * as Colyseus from 'colyseus.js'; // Import Colyseus client
 
 const stakesOptions = [1, 5, 10, 20, 50, 100];
 
@@ -19,8 +20,9 @@ const Lobby = () => {
   const [assignedTableId, setAssignedTableId] = useState(null);
   const [isJoiningQueue, setIsJoiningQueue] = useState(false);
   const { user, isLoading } = useContext(UserContext);
-  const { socket } = useContext(SocketContext);
+  const { colyseusClient } = useContext(SocketContext); // Use colyseusClient from context
   const navigate = useNavigate();
+  const roomRef = React.useRef(null); // To hold the Colyseus room instance
 
   // Filter tables by stake OR if user is seated
   const filteredTables = tables.filter(table =>
@@ -59,8 +61,8 @@ const Lobby = () => {
   };
 
   const joinQueue = useCallback(async (stakeToJoin, tableId) => {
-    if (!user || !user.username || !user.chips || isJoiningQueue) {
-      console.warn('User not ready or already joining queue');
+    if (!user || !user.username || !user.chips || isJoiningQueue || !colyseusClient) {
+      console.warn('User not ready, already joining queue, or Colyseus client not available');
       return;
     }
 
@@ -73,15 +75,67 @@ const Lobby = () => {
         return;
       }
 
-      socket.emit('join_queue', {
-        stake: stakeToJoin,
-        tableId: tableId,
-        player: {
+      try {
+        // Attempt to join the Colyseus room
+        const room = await colyseusClient.joinOrCreate('game_room', {
+          tableId,
           username: user.username,
           chips: user.chips,
-          isHuman: true
-        }
-      });
+        });
+        roomRef.current = room; // Store the room instance
+
+        console.log(`Joined Colyseus room: ${room.id} for table ${tableId}`);
+
+        // Colyseus rooms handle state sync automatically.
+        // We'll listen for 'table_assigned' or 'spectator_mode_active' messages from the room.
+        room.onMessage('table_assigned', (data) => {
+          console.log('Colyseus: Table assigned:', data);
+          setQueueStatus({});
+          setAssignedTableId(data.tableId);
+          setShowTableAssignedNotification(true);
+          setTimeout(() => {
+            setShowTableAssignedNotification(false);
+            navigate(`/table/${data.tableId}`);
+          }, 2000);
+        });
+
+        room.onMessage('spectator_mode_active', (data) => {
+          console.log('Colyseus: Spectator mode activated (lobby):', data);
+          setQueueStatus({});
+          if (data.tableId) {
+            navigate(`/table/${data.tableId}`);
+          }
+        });
+
+        room.onMessage('queue_status', (data) => {
+          setQueueStatus(prev => ({
+            ...prev,
+            [data.stake]: {
+              position: data.position,
+              queueSize: data.queueSize,
+              estimatedWait: data.estimatedWait || 0
+            }
+          }));
+        });
+
+        room.onError((code, message) => {
+          console.error('Colyseus room error:', code, message);
+          alert(`Game room error: ${message} (Code: ${code})`);
+          setIsJoiningQueue(false);
+        });
+
+        room.onLeave((code) => {
+          console.log('Colyseus room left:', code);
+          // Handle leaving the room, e.g., clear queue status
+          setQueueStatus({});
+          setIsJoiningQueue(false);
+        });
+
+      } catch (e) {
+        console.error('Colyseus joinOrCreate failed:', e);
+        alert(`Failed to join game: ${e.message}`);
+        setIsJoiningQueue(false);
+      }
 
       console.log(`Joining queue for stake: $${stakeToJoin}, tableId: ${tableId}`);
     } catch (error) {
@@ -91,13 +145,17 @@ const Lobby = () => {
     }
   }, [user, isJoiningQueue]);
 
-  const leaveQueue = useCallback((stakeToLeave) => {
-    if (!user) return;
+  const leaveQueue = useCallback(async (stakeToLeave) => {
+    if (!user || !roomRef.current) return;
 
-    socket.emit('leave_queue', {
-      stake: stakeToLeave,
-      username: user.username
-    });
+    // Colyseus doesn't have a direct 'leave_queue' message.
+    // Leaving the room implies leaving any associated queue.
+    try {
+      await roomRef.current.leave();
+      console.log(`Left Colyseus room for stake: $${stakeToLeave}`);
+    } catch (e) {
+      console.error('Error leaving Colyseus room:', e);
+    }
 
     setQueueStatus(prev => {
       const newStatus = { ...prev };
@@ -115,90 +173,26 @@ const Lobby = () => {
   useEffect(() => {
     fetchTables();
 
-    // Socket event handlers
-    const handleTablesUpdate = (data) => {
-      setTables(data.tables || []);
-    };
+    // Fetch tables initially and on visibility change
+    fetchTables();
 
-    const handleTableAssigned = (data) => {
-      console.log('Table assigned:', data);
-      setQueueStatus({}); // Clear queue status when assigned
-      setAssignedTableId(data.tableId);
-      setShowTableAssignedNotification(true);
-
-      // Navigate after a short delay to allow the user to see the notification
-      setTimeout(() => {
-        setShowTableAssignedNotification(false);
-        navigate(`/table/${data.tableId}`);
-      }, 2000); // Show notification for 2 seconds
-    };
-
-    // --- NEW: Handle spectator mode activation from backend ---
-    const handleSpectatorModeActive = (data) => {
-      console.log('Spectator mode activated (lobby):', data);
-      setQueueStatus({});
-      if (data.tableId) {
-        navigate(`/table/${data.tableId}`);
-      }
-    };
-
-    const handleQueueStatus = (data) => {
-      setQueueStatus(prev => ({
-        ...prev,
-        [data.stake]: {
-          position: data.position,
-          queueSize: data.queueSize,
-          estimatedWait: data.estimatedWait || 0
-        }
-      }));
-    };
-
-    // ✅ Add specific handler for leave_table results
-  const handleLeaveTableResult = (data) => {
-    if (!data.success) {
-      console.error('Failed to leave table:', data.message);
-      // Only show error if it's actually a failure
-      alert(data.message || 'Failed to leave table');
-    } else {
-      console.log('Successfully left table:', data.message);
-    }
-  };
-
-    const handleError = (error) => {
-      console.error('Socket error:', error);
-      alert(error.message || 'An error occurred');
-      setIsJoiningQueue(false);
-    };
-
-    // Register socket listeners
-    if (socket) {
-      socket.on('tables_update', handleTablesUpdate);
-      socket.on('table_assigned', handleTableAssigned);
-      socket.on('queue_status', handleQueueStatus);
-      socket.on('leave_table_result', handleLeaveTableResult);
-      socket.on('error', handleError);
-      // --- NEW: Listen for spectator_mode_active in the lobby ---
-      socket.on('spectator_mode_active', handleSpectatorModeActive);
-    }
-
-    // Refresh tables when tab becomes visible
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) fetchTables();
     });
 
+    // No direct socket.io listeners needed here anymore,
+    // as Colyseus room messages are handled within joinQueue.
+
     return () => {
-      if (socket) {
-        socket.off('tables_update', handleTablesUpdate);
-        socket.off('table_assigned', handleTableAssigned);
-        socket.off('queue_status', handleQueueStatus);
-        socket.off('leave_table_result', handleLeaveTableResult);
-        socket.off('error', handleError);
-        // --- NEW: Unregister spectator_mode_active handler ---
-        socket.off('spectator_mode_active', handleSpectatorModeActive);
-      }
+      // Clean up event listener
       document.removeEventListener('visibilitychange', fetchTables);
+      // If a room is active, leave it on component unmount
+      if (roomRef.current) {
+        roomRef.current.leave();
+        roomRef.current = null;
+      }
     };
-  }, [navigate, fetchTables, user, isLoading]); // Added user and isLoading to dependencies
+  }, [navigate, fetchTables, user, isLoading, colyseusClient]); // Added colyseusClient to dependencies
 
   // Redirect if user is not logged in and loading is complete
   useEffect(() => {
@@ -378,10 +372,11 @@ const Lobby = () => {
         })}
       </div>
 
-      {/* Connection Status */}
+      {/* Connection Status (Colyseus client connection is implicit via room join) */}
+      {/* You might want a more sophisticated connection status based on roomRef.current */}
       <div className="connection-indicator">
-        <span className={`status ${socket && socket.connected ? 'connected' : 'disconnected'}`}>
-          {socket && socket.connected ? '🟢 Connected' : '🔴 Disconnected'}
+        <span className={`status ${roomRef.current ? 'connected' : 'disconnected'}`}>
+          {roomRef.current ? '🟢 Connected to Room' : '🔴 Not in Room'}
         </span>
       </div>
 

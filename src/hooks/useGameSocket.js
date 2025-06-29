@@ -1,244 +1,210 @@
 // File: tonk-game/src/hooks/useGameSocket.js
-import { useEffect, useState, useRef } from 'react';
-import { calculateStateHash } from '../utils/gameUtils';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import * as Colyseus from 'colyseus.js';
+// import { calculateStateHash } from '../utils/gameUtils'; // No longer needed for Colyseus state hashing
 
-export const useGameSocket = (socket, tableId, user, gameState, setGameState) => {
-  const lastStateHashRef = useRef(null);
+export const useGameSocket = (colyseusClient, tableId, user, gameState, setGameState) => {
+  const roomRef = useRef(null);
   const reconnectAttempts = useRef(0);
   const maxReconnectAttempts = 5;
   const playerPositionRef = useRef(null);
+  const isConnectingRef = useRef(false); // To prevent multiple connection attempts
 
   const updateGameState = typeof setGameState === 'function' ? setGameState : () => {
     console.warn('setGameState is not a function');
   };
 
-  useEffect(() => {
-    if (!socket || !user || !tableId) return;
+  const connectToRoom = useCallback(async () => {
+    if (!colyseusClient || !user || !tableId || isConnectingRef.current) {
+      console.log('Skipping connectToRoom:', { colyseusClient, user, tableId, isConnecting: isConnectingRef.current });
+      return;
+    }
 
-    const handleConnect = () => {
-      console.log('🟢 Socket connected — requesting state sync:', tableId);
-      reconnectAttempts.current = 0;
-      socket.emit('request_state_sync', { tableId });
-      updateGameState(prev => ({ ...prev, error: null, connectionStatus: 'connected' })); // Clear error and confirm connected status
-    };
+    isConnectingRef.current = true;
+    updateGameState(prev => ({ ...prev, connectionStatus: 'connecting', error: null, isLoading: true }));
 
-    const syncInterval = setInterval(() => {
-      if (socket?.connected && tableId) {
-        console.log('🔄 Periodic state sync request:', tableId);
-        socket.emit('request_state_sync', { tableId, type: 'periodic_sync' });
-      }
-    }, 30000);
-
-    const handleStateSync = (newState, eventType = 'state_sync') => {
-      if (!newState) return;
-
-      const shouldDeduplicate = ['state_sync', 'periodic_sync'].includes(eventType);
-      if (shouldDeduplicate) {
-        const stateHash = JSON.stringify({
-          gameOver: newState.gameOver,
-          gameStarted: newState.gameStarted,
-          currentTurn: newState.currentTurn,
-          playerCount: newState.players?.length,
-          deckLength: newState.deck?.length,
-          discardLength: newState.discardPile?.length,
-          timestamp: newState.timestamp
-        });
-
-        if (lastStateHashRef.current === stateHash) {
-          console.log('🔄 Skipping duplicate state update');
-          return;
-        }
-
-        lastStateHashRef.current = stateHash;
-      }
-
-      const validPlayers = Array.isArray(newState.players)
-        ? newState.players.filter(p => p && p.username)
-        : [];
-
-      const currentPlayerIndex = validPlayers.findIndex(
-        (p) => p.username?.trim().toLowerCase() === user?.username?.trim().toLowerCase()
-      );
-
-      if (currentPlayerIndex !== -1) {
-        playerPositionRef.current = currentPlayerIndex;
-      }
-
-      const sanitizedState = {
-        ...newState,
-        players: validPlayers,
-        currentTurn: typeof newState.currentTurn === 'number' ? newState.currentTurn : 0,
-        playerHands: Array.isArray(newState.playerHands) ? newState.playerHands : [],
-        playerSpreads: Array.isArray(newState.playerSpreads) ? newState.playerSpreads : [],
-        deck: Array.isArray(newState.deck) ? newState.deck : [],
-        discardPile: Array.isArray(newState.discardPile) ? newState.discardPile : [],
-        isInitialized: true,
-        isLoading: false,
-        connectionStatus: 'connected',
-        error: null,
-        lastUpdateTime: Date.now(),
-        playerPosition: playerPositionRef.current,
-        isMultiplayer: validPlayers.filter(p => p.isHuman).length > 1,
-        timestamp: Date.now(),
-        hitPenaltyRounds: validPlayers[playerPositionRef.current]?.hitPenaltyRounds || 0
-      };
-
-      updateGameState({ ...sanitizedState });
-    };
-
-    const handleGameStartingCountdown = (data) => {
-      updateGameState(prev => ({
-        ...prev,
-        gameStartingCountdown: data.countdown,
-        message: data.message,
-        timestamp: Date.now()
-      }));
-    };
-
-    const handleTableAssigned = ({ tableId: assignedTableId, seat }) => {
-      if (assignedTableId === tableId) {
-        setTimeout(() => socket.emit('request_state_sync', { tableId: assignedTableId }), 1000);
-        setTimeout(() => socket.emit('request_state_sync', { tableId: assignedTableId }), 2000);
-      }
-    };
-
-    const handlePlayerReadyUpdate = (data) => {
-      updateGameState(prev => {
-        const newReadyPlayers = [...(prev.readyPlayers || [])];
-        if (!newReadyPlayers.includes(data.username)) {
-          newReadyPlayers.push(data.username);
-        }
-        return { ...prev, readyPlayers: newReadyPlayers, timestamp: Date.now() };
+    try {
+      console.log(`Attempting to join Colyseus room 'game_room' with tableId: ${tableId}`);
+      const room = await colyseusClient.joinOrCreate('game_room', {
+        tableId,
+        username: user.username,
+        chips: user.chips,
+        // Add any other initial player data needed by the room
       });
-    };
+      roomRef.current = room;
+      reconnectAttempts.current = 0;
 
-    const handlePlayerJoined = (data) => {
-      updateGameState(prev => ({
-        ...prev,
-        players: data.players || prev.players,
-        message: `${data.playerName} joined the table`
-      }));
-    };
+      console.log('🟢 Colyseus room joined successfully:', room.id);
+      updateGameState(prev => ({ ...prev, connectionStatus: 'connected', error: null, isLoading: false }));
 
-    const handlePlayerLeft = (data) => {
-      const message = data.isDisconnect
-        ? `${data.username} disconnected from the table`
-        : `${data.username} left the table`;
+      room.onStateChange((state) => {
+        console.log('🔄 Colyseus state update received:', state);
+        const validPlayers = Array.isArray(state.players)
+          ? state.players.filter(p => p && p.username)
+          : [];
 
-      updateGameState(prev => ({
-        ...prev,
-        players: data.players || prev.players,
-        message,
-        timestamp: Date.now()
-      }));
-    };
+        const currentPlayerIndex = validPlayers.findIndex(
+          (p) => p.username?.trim().toLowerCase() === user?.username?.trim().toLowerCase()
+        );
 
-    const handlePlayerReconnected = (data) => {
-      updateGameState(prev => ({
-        ...prev,
-        players: data.players || prev.players,
-        message: `${data.username} reconnected`,
-        timestamp: Date.now()
-      }));
-    };
+        if (currentPlayerIndex !== -1) {
+          playerPositionRef.current = currentPlayerIndex;
+        }
 
-    const handleTableStatusUpdate = (data) => {
-      if (data.tableId === tableId) {
+        const sanitizedState = {
+          ...state,
+          players: validPlayers,
+          currentTurn: typeof state.currentTurn === 'number' ? state.currentTurn : 0,
+          playerHands: Array.isArray(state.playerHands) ? state.playerHands : [],
+          playerSpreads: Array.isArray(state.playerSpreads) ? state.playerSpreads : [],
+          deck: Array.isArray(state.deck) ? state.deck : [],
+          discardPile: Array.isArray(state.discardPile) ? state.discardPile : [],
+          isInitialized: true,
+          isLoading: false,
+          connectionStatus: 'connected',
+          error: null,
+          lastUpdateTime: Date.now(),
+          playerPosition: playerPositionRef.current,
+          isMultiplayer: validPlayers.filter(p => p.isHuman).length > 1,
+          timestamp: Date.now(),
+          hitPenaltyRounds: validPlayers[playerPositionRef.current]?.hitPenaltyRounds || 0,
+          chipBalances: state.chipBalances ? Object.fromEntries(state.chipBalances) : {}, // Convert MapSchema to plain object
+          readyPlayers: Array.isArray(state.readyPlayers) ? state.readyPlayers : [],
+          pot: state.pot || 0,
+          gameStartingCountdown: state.gameStartingCountdown || 0,
+          message: state.message || ""
+        };
+        updateGameState(sanitizedState);
+      });
+
+      room.onMessage("player_joined", (data) => {
+        console.log('Colyseus: player_joined', data);
         updateGameState(prev => ({
           ...prev,
-          status: data.status,
-          playerCount: data.playerCount
+          players: data.players || prev.players,
+          message: `${data.username} joined the table`,
+          timestamp: Date.now()
         }));
-      }
-    };
+      });
 
-    const handlePlayersUpdate = ({ players, spectators, readyPlayers }) => {
-      updateGameState(prev => ({
-        ...prev,
-        players: players || prev.players,
-        spectators: spectators || prev.spectators,
-        readyPlayers: Array.from(readyPlayers || []),
-        timestamp: Date.now()
-      }));
-    };
-
-    const handleDisconnect = (reason) => {
-      console.log('🔴 Socket disconnected:', reason);
-      updateGameState(prev => ({
-        ...prev,
-        connectionStatus: 'disconnected',
-        error: null // Remove the specific message
-      }));
-    };
-
-    const handleReconnect = (attemptNumber) => {
-      reconnectAttempts.current = attemptNumber;
-      if (attemptNumber <= maxReconnectAttempts) {
+      room.onMessage("player_left", (data) => {
+        console.log('Colyseus: player_left', data);
         updateGameState(prev => ({
           ...prev,
-          connectionStatus: 'reconnecting',
-          error: null // Remove the specific message
+          players: data.players || prev.players,
+          message: `${data.username} left the table`,
+          timestamp: Date.now()
         }));
-      }
-    };
+      });
 
-    const handleReconnectFailed = () => {
+      room.onMessage("player_reconnected", (data) => {
+        console.log('Colyseus: player_reconnected', data);
+        updateGameState(prev => ({
+          ...prev,
+          players: data.players || prev.players,
+          message: `${data.username} reconnected`,
+          timestamp: Date.now()
+        }));
+      });
+
+      room.onMessage("player_ready_update", (data) => {
+        console.log('Colyseus: player_ready_update', data);
+        updateGameState(prev => ({
+          ...prev,
+          readyPlayers: data.readyPlayers || [],
+          timestamp: Date.now()
+        }));
+      });
+
+      room.onMessage("game_starting_countdown", (data) => {
+        console.log('Colyseus: game_starting_countdown', data);
+        updateGameState(prev => ({
+          ...prev,
+          gameStartingCountdown: data.countdown,
+          message: data.message,
+          timestamp: Date.now()
+        }));
+      });
+
+      room.onMessage("game_over", (data) => {
+        console.log('Colyseus: game_over', data);
+        updateGameState(prev => ({
+          ...prev,
+          gameOver: true,
+          winners: data.winners,
+          scores: data.scores,
+          winType: data.winType,
+          timestamp: Date.now()
+        }));
+      });
+
+      room.onLeave((code) => {
+        console.log('🔴 Colyseus room left:', code);
+        updateGameState(prev => ({
+          ...prev,
+          connectionStatus: 'disconnected',
+          error: 'Disconnected from game room.',
+          isLoading: false
+        }));
+        roomRef.current = null;
+      });
+
+      room.onError((code, message) => {
+        console.error('🚨 Colyseus room error:', code, message);
+        updateGameState(prev => ({
+          ...prev,
+          connectionStatus: 'error',
+          error: `Game error: ${message} (Code: ${code})`,
+          isLoading: false
+        }));
+      });
+
+    } catch (e) {
+      console.error('🚨 Colyseus connection failed:', e);
       updateGameState(prev => ({
         ...prev,
         connectionStatus: 'failed',
-        error: 'Connection failed. Please refresh the page.'
+        error: `Failed to connect to game: ${e.message}`,
+        isLoading: false
       }));
-    };
+      roomRef.current = null;
+    } finally {
+      isConnectingRef.current = false;
+    }
+  }, [colyseusClient, tableId, user, updateGameState]);
 
-    const handleGameOver = (data) => {
-      updateGameState(prev => ({
-        ...prev,
-        gameOver: true,
-        winners: data.winners,
-        scores: data.scores,
-        winType: data.winType,
-        timestamp: Date.now()
-      }));
-    };
-
-    // Register all events
-    socket.on('connect', handleConnect);
-    socket.on('game_update', (state) => handleStateSync(state, 'game_update'));
-    socket.on('state_sync', (state) => handleStateSync(state, 'state_sync'));
-    socket.on('game_started', (state) => handleStateSync(state, 'game_started'));
-    socket.on('game_starting_countdown', handleGameStartingCountdown);
-    socket.on('table_assigned', handleTableAssigned);
-    socket.on('player_joined', handlePlayerJoined);
-    socket.on('player_left', handlePlayerLeft);
-    socket.on('player_reconnected', handlePlayerReconnected);
-    socket.on('table_status_update', handleTableStatusUpdate);
-    socket.on('table_players_update', handlePlayersUpdate);
-    socket.on('player_ready_update', handlePlayerReadyUpdate);
-    socket.on('disconnect', handleDisconnect);
-    socket.on('reconnect', handleReconnect);
-    socket.on('reconnect_failed', handleReconnectFailed);
-    socket.on('game_over', handleGameOver);
+  useEffect(() => {
+    connectToRoom();
 
     return () => {
-      clearInterval(syncInterval);
-      socket.off('connect', handleConnect);
-      socket.off('disconnect', handleDisconnect);
-      socket.off('reconnect', handleReconnect);
-      socket.off('reconnect_failed', handleReconnectFailed);
-      socket.off('game_update');
-      socket.off('state_sync');
-      socket.off('game_started');
-      socket.off('game_starting_countdown', handleGameStartingCountdown);
-      socket.off('table_assigned', handleTableAssigned);
-      socket.off('player_joined', handlePlayerJoined);
-      socket.off('player_left', handlePlayerLeft);
-      socket.off('player_reconnected', handlePlayerReconnected);
-      socket.off('table_status_update', handleTableStatusUpdate);
-      socket.off('table_players_update', handlePlayersUpdate);
-      socket.off('player_ready_update', handlePlayerReadyUpdate);
-      socket.off('game_over', handleGameOver);
+      if (roomRef.current) {
+        console.log('🚪 Leaving Colyseus room on unmount.');
+        roomRef.current.leave();
+        roomRef.current = null;
+      }
     };
-  }, [socket, tableId, user?.username]);
+  }, [connectToRoom]);
+
+  // Expose a send function for game actions
+  const sendGameAction = useCallback((action, payload) => {
+    if (roomRef.current) {
+      console.log(`Sending game_action: ${action}`, payload);
+      roomRef.current.send('game_action', { action, payload });
+    } else {
+      console.warn('Cannot send game action: Not connected to a Colyseus room.');
+    }
+  }, []);
+
+  const sendPlayerReady = useCallback((username) => {
+    if (roomRef.current) {
+      console.log(`Sending player_ready for ${username}`);
+      roomRef.current.send('player_ready', { username });
+    } else {
+      console.warn('Cannot send player ready: Not connected to a Colyseus room.');
+    }
+  }, []);
+
+  return { room: roomRef.current, sendGameAction, sendPlayerReady };
 };
 
 
