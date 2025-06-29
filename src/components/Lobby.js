@@ -14,6 +14,8 @@ const Lobby = () => {
   const [stake, setStake] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [queueStatus, setQueueStatus] = useState({});
+  const [showTableAssignedNotification, setShowTableAssignedNotification] = useState(false);
+  const [assignedTableId, setAssignedTableId] = useState(null);
   const [isJoiningQueue, setIsJoiningQueue] = useState(false);
   const { user, isLoading } = useContext(UserContext);
   const { socket } = useContext(SocketContext);
@@ -119,9 +121,15 @@ const Lobby = () => {
 
     const handleTableAssigned = (data) => {
       console.log('Table assigned:', data);
-      // Clear queue status when assigned
-      setQueueStatus({});
-      navigate(`/table/${data.tableId}`);
+      setQueueStatus({}); // Clear queue status when assigned
+      setAssignedTableId(data.tableId);
+      setShowTableAssignedNotification(true);
+
+      // Navigate after a short delay to allow the user to see the notification
+      setTimeout(() => {
+        setShowTableAssignedNotification(false);
+        navigate(`/table/${data.tableId}`);
+      }, 2000); // Show notification for 2 seconds
     };
 
     // --- NEW: Handle spectator mode activation from backend ---
@@ -250,13 +258,39 @@ const Lobby = () => {
         />
       )}
 
+      <div className="queue-status-section bg-gray-800 p-4 rounded-lg shadow-lg mb-6">
+        <h2 className="text-xl font-bold text-lightText mb-3">Your Queue Status</h2>
+        {Object.keys(queueStatus).length > 0 ? (
+          Object.entries(queueStatus).map(([stake, status]) => (
+            <div key={stake} className="flex items-center justify-between bg-gray-700 p-3 rounded-md mb-2">
+              <p className="text-lg text-accentGold font-semibold">Stake: ${stake}</p>
+              <div className="flex items-center space-x-4">
+                <p className="text-lightText">Position: <span className="font-bold">{status.position}/{status.queueSize}</span></p>
+                {status.estimatedWait > 0 && (
+                  <p className="text-lightText">Est. Wait: <span className="font-bold">{status.estimatedWait}s</span></p>
+                )}
+                <button
+                  className="bg-accentRed text-lightText px-3 py-1 rounded-md text-sm font-semibold hover:bg-red-700 transition-colors duration-200"
+                  onClick={() => leaveQueue(parseInt(stake))}
+                >
+                  Leave Queue
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-400">You are not currently in any queue.</p>
+        )}
+      </div>
+
       <div className="tables-grid">
         {filteredTables.map(table => {
-          const inQueue = queueStatus[table.stake];
+          const inQueueForThisTable = queueStatus[table.stake] && queueStatus[table.stake].tableId === table._id;
           const isAtTable = table.players.some(p => p.username === user?.username);
           const isFull = table.players.length >= 4;
           const isPlaying = table.status === 'in_progress';
           const hasEnoughChips = user?.chips >= table.stake;
+          const hasAIPlayers = table.players.some(p => !p.isHuman);
 
           return (
             <div key={table._id} className="table-card">
@@ -286,43 +320,43 @@ const Lobby = () => {
                 <span className={`table-status ${table.status}`}>
                   {table.status === 'waiting' ? 'Waiting' : 'In Progress'}
                 </span>
+                {isFull && <span className="table-tag full">Full</span>}
+                {hasAIPlayers && <span className="table-tag ai">AI Players</span>}
+                {!isFull && !hasAIPlayers && <span className="table-tag joinable">Join Now</span>}
               </div>
 
               <div className="table-actions">
                 <span className="table-name">{table.name}</span>
                 
-                {!isAtTable && !inQueue && (
-                  <button 
+                {!isAtTable && !inQueueForThisTable && !isFull && (
+                  <button
                     className={`join-button ${!hasEnoughChips ? 'disabled' : ''}`}
                     onClick={() => joinQueue(table.stake, table._id)}
-                    disabled={isJoiningQueue || !hasEnoughChips}
+                    disabled={isJoiningQueue || !hasEnoughChips || isFull}
                   >
                     {isJoiningQueue ? 'Joining...' : `Join Queue ($${table.stake})`}
                   </button>
                 )}
 
-                {!hasEnoughChips && !isAtTable && !inQueue && (
-                  <div className="insufficient-chips">
-                    Need ${table.stake - (user?.chips || 0)} more chips
+                {!hasEnoughChips && !isAtTable && !inQueueForThisTable && (
+                  <div className="insufficient-chips text-red-400 text-sm mt-2">
+                    Need ${table.stake - (user?.chips || 0)} more chips. <Link to="/userprofile" className="text-primary hover:underline">Visit your profile to buy more.</Link>
                   </div>
                 )}
 
-                {inQueue && (
-                  <div className="queue-info">
-                    <button 
-                      className="leave-button" 
+                {inQueueForThisTable && (
+                  <div className="queue-info bg-blue-800 text-lightText p-2 rounded-md mt-2">
+                    <p className="font-semibold">In Queue:</p>
+                    <p>Position: {queueStatus[table.stake].position}/{queueStatus[table.stake].queueSize}</p>
+                    {queueStatus[table.stake].estimatedWait > 0 && (
+                      <p>Est. wait: {queueStatus[table.stake].estimatedWait}s</p>
+                    )}
+                    <button
+                      className="bg-accentRed text-lightText px-3 py-1 rounded-md text-sm font-semibold hover:bg-red-700 transition-colors duration-200 mt-2"
                       onClick={() => leaveQueue(table.stake)}
                     >
                       Leave Queue
                     </button>
-                    <div className="queue-position">
-                      Position: {inQueue.position}/{inQueue.queueSize}
-                      {inQueue.estimatedWait > 0 && (
-                        <div className="estimated-wait">
-                          Est. wait: {inQueue.estimatedWait}s
-                        </div>
-                      )}
-                    </div>
                   </div>
                 )}
 
@@ -349,9 +383,18 @@ const Lobby = () => {
           {socket && socket.connected ? '🟢 Connected' : '🔴 Disconnected'}
         </span>
       </div>
+
+      {showTableAssignedNotification && (
+        <div className="fixed inset-0 bg-darkBackground bg-opacity-90 flex items-center justify-center z-50">
+          <div className="bg-primary p-8 rounded-lg shadow-xl text-lightText text-center animate-pulse">
+            <h2 className="text-3xl font-bold mb-4">Table Found!</h2>
+            <p className="text-xl">Redirecting to Table {assignedTableId}...</p>
+            <p className="text-sm mt-2">Get ready to play!</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Lobby;
-

@@ -39,7 +39,8 @@ const PlayerSection = ({
     isCurrentPlayer, // NEW: Indicates if this is the current user
     totalPlayers, // NEW: Total number of players in game
     isSpectator, // ✅ NEW: Accept isSpectator prop
-    showActions = false // NEW: Only show action buttons for bottom player
+    showActions = false, // NEW: Only show action buttons for bottom player
+    validHitSpreads = [] // NEW: Array of booleans indicating valid hit targets for each spread
   }) => {
     const [selectedCards, setSelectedCards] = useState([]);
     const [selectedSpread, setSelectedSpread] = useState(null);
@@ -190,6 +191,7 @@ const PlayerSection = ({
                     position={position}
                     className="w-full"
                     playerIndex={playerIndex}
+                    validHitSpreads={validHitSpreads[playerIndex] || []} // Pass validHitSpreads
                 />
 
                 {showActions && isCurrentTurn && !isHidden && !isSpectator && (
@@ -252,7 +254,8 @@ PlayerSection.propTypes = {
     isCurrentPlayer: PropTypes.bool, // Add prop type for isCurrentPlayer
     totalPlayers: PropTypes.number, // Add prop type for totalPlayers
     isSpectator: PropTypes.bool,
-    showActions: PropTypes.bool // Only show action buttons for bottom player
+    showActions: PropTypes.bool, // Only show action buttons for bottom player
+    validHitSpreads: PropTypes.arrayOf(PropTypes.bool) // Add prop type for validHitSpreads
 };
 
 // Provide default props
@@ -272,7 +275,8 @@ PlayerSection.defaultProps = {
     isCurrentPlayer: false, // Default value
     totalPlayers: 0, // Default value
     isSpectator: false,
-    showActions: false
+    showActions: false,
+    validHitSpreads: []
 };
 
 export default memo(PlayerSection);

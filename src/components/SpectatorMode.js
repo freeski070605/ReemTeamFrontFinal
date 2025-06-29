@@ -5,6 +5,7 @@ import './SpectatorMode.css';
 const SpectatorMode = ({
   gameState,
   message,
+  detailedReason, // New prop for detailed reason
   transitionId,
   willJoinNextHand,
   estimatedTime,
@@ -32,16 +33,19 @@ const SpectatorMode = ({
   };
 
   const getSpectatorMessage = () => {
+    if (detailedReason) {
+      return detailedReason;
+    }
     if (transitionId) {
-      return timeRemaining > 0 
+      return timeRemaining > 0
         ? `You'll join when this hand completes (≈${formatTime(timeRemaining)})`
         : 'You\'ll join when this hand completes';
     }
-    
+
     if (willJoinNextHand) {
       return 'Table is full - you\'ll join the next hand';
     }
-    
+
     return message || 'Spectating current game';
   };
 
@@ -111,15 +115,15 @@ const SpectatorMode = ({
         <div className="spectator-status">
           <div className="status-icon">👁️</div>
           <div className="status-text">
-            <h3>Spectator Mode</h3>
-            <p>{getSpectatorMessage()}</p>
+            <h3 className="text-xl font-bold text-lightText">Spectator Mode</h3>
+            <p className="text-gray-300">{getSpectatorMessage()}</p>
           </div>
         </div>
-        
+
         {transitionId && (
-          <div className="transition-indicator">
-            <div className="transition-pulse"></div>
-            <span>Joining next...</span>
+          <div className="transition-indicator flex items-center space-x-2 bg-blue-700 text-white px-4 py-2 rounded-full shadow-md">
+            <div className="transition-pulse w-3 h-3 bg-white rounded-full animate-pulse"></div>
+            <span>Joining next hand...</span>
           </div>
         )}
         

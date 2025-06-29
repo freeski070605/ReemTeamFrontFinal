@@ -17,7 +17,8 @@ const PlayerSpreads = ({
   playerIndex, // Use playerIndex instead of converting position
   isHitModeActive, // New prop: indicates if the current user is in hit mode
   isCurrentPlayer, // New prop: indicates if this PlayerSection belongs to the current user
-  isSpectator // New prop: indicates if the current user is a spectator
+  isSpectator, // New prop: indicates if the current user is a spectator
+  validHitSpreads = [] // New prop: array of booleans indicating valid hit targets
 }) => {
 
   const handleSpreadClick = (spreadIndex, event) => {
@@ -61,8 +62,9 @@ const PlayerSpreads = ({
                   <div
                       key={`spread-${spreadIndex}`}
                       className={`flex gap-1 bg-accentGold/10 p-2 rounded-lg min-w-fit cursor-pointer transition-all duration-200 ease-in-out shadow-sm border-2 border-transparent
-                                  hover:translate-y-[-4px] hover:scale-105 hover:bg-accentGold/20 hover:shadow-lg hover:border-accentGold
-                                  ${isHitModeActive && selectedCard !== null && !isSpectator ? 'border-primary' : ''}`}
+                                  hover:translate-y-[-4px] hover:scale-105 hover:bg-accentGold/20 hover:shadow-lg
+                                  ${isHitModeActive && selectedCard !== null && !isSpectator && validHitSpreads[spreadIndex] ? 'border-green-500 ring-4 ring-green-500' : ''}
+                                  ${isHitModeActive && selectedCard !== null && !isSpectator && !validHitSpreads[spreadIndex] ? 'opacity-50 cursor-not-allowed' : ''}`}
                       onClick={(event) => handleSpreadClick(spreadIndex, event)}
                   >
                       {spread.map((card, cardIndex) => {
@@ -98,7 +100,8 @@ PlayerSpreads.propTypes = {
   playerIndex: PropTypes.number, // Add prop type for playerIndex
   isHitModeActive: PropTypes.bool, // Add new prop type
   isCurrentPlayer: PropTypes.bool, // Add new prop type
-  isSpectator: PropTypes.bool // Add new prop type
+  isSpectator: PropTypes.bool, // Add new prop type
+  validHitSpreads: PropTypes.arrayOf(PropTypes.bool) // Add new prop type
 };
 
 // Provide default props
@@ -112,7 +115,8 @@ PlayerSpreads.defaultProps = {
   playerIndex: -1,
   isHitModeActive: false,
   isCurrentPlayer: false,
-  isSpectator: false
+  isSpectator: false,
+  validHitSpreads: []
 };
 
 export default PlayerSpreads;

@@ -1,4 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import Modal from 'react-modal';
 import AuthService from './AuthService';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +10,7 @@ const LoginPage = ({ handleLogin, onClose }) => {
   const { setUser } = useContext(UserContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -105,14 +108,23 @@ const LoginPage = ({ handleLogin, onClose }) => {
               className="w-full p-sm rounded-sm bg-gray-700 text-lightText placeholder-gray-400 border border-borderColor focus:outline-none focus:ring-2 focus:ring-primary"
             />
           )}
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full p-sm rounded-sm bg-gray-700 text-lightText placeholder-gray-400 border border-borderColor focus:outline-none focus:ring-2 focus:ring-primary"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full p-sm rounded-sm bg-gray-700 text-lightText placeholder-gray-400 border border-borderColor focus:outline-none focus:ring-2 focus:ring-primary pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-lightText"
+            >
+              <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+            </button>
+          </div>
           <button
             type="submit"
             className="w-full bg-primary text-lightText p-sm rounded-sm font-semibold hover:bg-buttonHover transition-colors duration-200"

@@ -47,10 +47,12 @@ const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selec
 
                     const cardClasses = `
                         flex-shrink-0 cursor-pointer transition-all duration-200 ease-in-out transform-gpu
+                        flex-shrink-0 cursor-pointer transition-all duration-200 ease-in-out transform-gpu
                         w-20 max-w-[90px] min-w-12 rounded-md bg-cardBackground shadow-sm border-2 border-transparent relative z-10
                         hover:scale-110 hover:-translate-y-2 hover:shadow-lg hover:border-accentGold hover:z-30
                         ${isActive ? 'pointer-events-auto' : 'pointer-events-none'}
                         ${selectedCard === card.originalIndex ? 'scale-110 -translate-y-4 shadow-xl border-accentGold z-40' : ''}
+                        ${hitMode && selectedCard === card.originalIndex ? 'border-blue-500 ring-4 ring-blue-500' : ''}
                     `;
 
                     return (

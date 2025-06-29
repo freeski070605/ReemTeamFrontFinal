@@ -43,8 +43,9 @@ const AuthService = {
         return { success: false, error: response.data.message };
       }
     } catch (error) {
-      console.error('Login error:', error);
-      throw new Error('Failed to login. Please try again.');
+      console.error('Login error:', error.response?.data || error.message);
+      // Return specific error message from backend if available, otherwise a generic one
+      return { success: false, error: error.response?.data?.message || 'Failed to login. Please check your credentials.' };
     }
   },
 
@@ -55,8 +56,9 @@ const AuthService = {
       clearAuthState(); // Clear local and session storage
       window.location.href = '/'; // Use window.location.href for a full page reload and redirect
     } catch (error) {
-      console.error('Logout error:', error);
-      throw new Error('Failed to logout. Please try again.');
+      console.error('Logout error:', error.response?.data || error.message);
+      // Return specific error message from backend if available, otherwise a generic one
+      return { success: false, error: error.response?.data?.message || 'Failed to logout. Please try again.' };
     }
   },
 

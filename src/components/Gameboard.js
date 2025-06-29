@@ -27,6 +27,7 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
     const [isInitialized, setIsInitialized] = useState(false);
     const [selectedCard, setSelectedCard] = useState(null);
     const [hitMode, setHitMode] = useState(false);
+    const [actionBlockedMessage, setActionBlockedMessage] = useState('');
     const { socket } = useContext(SocketContext); // ✅ context-based socket
 
 
@@ -205,6 +206,8 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
       // This check ensures the *user interacting* is the current player, in hit mode, etc.    
       if (!hitMode || selectedCard === null || adjustedCurrentTurn !== 0 || isSpectator) {
           console.log('Hit attempt blocked by GameBoard validation:', { hitMode, selectedCard, adjustedCurrentTurn, isSpectator });
+          setActionBlockedMessage("You are not in hit mode or it's not your turn.");
+          setTimeout(() => setActionBlockedMessage(''), 2000);
           return;
       }
   
@@ -234,6 +237,8 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
   
       if (!targetSpread || !hitIsValid) { // Use the result of the validation
         console.error('Invalid hit target or validation failed');
+        setActionBlockedMessage("Invalid hit target or card cannot be hit here.");
+        setTimeout(() => setActionBlockedMessage(''), 2000);
         return;
       }
   
@@ -296,7 +301,11 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
             hitPenaltyRounds,
             canDrop
         });
-        if (isSpectator) return;
+        if (isSpectator) {
+          setActionBlockedMessage("Spectators cannot perform actions.");
+          setTimeout(() => setActionBlockedMessage(''), 2000);
+          return;
+        }
         if (canDrop) {
             console.log('[DROP EMIT] Emitting DROP action to backend', {
                 tableId,
@@ -307,6 +316,9 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                 action: 'DROP'
             });
         } else {
+            const reason = hitPenaltyRounds > 0 ? `Cannot drop with a ${hitPenaltyRounds}-round penalty.` : "You must draw a card first.";
+            setActionBlockedMessage(`Drop blocked: ${reason}`);
+            setTimeout(() => setActionBlockedMessage(''), 2000);
             console.warn('[DROP BLOCKED] Drop action blocked by state', {
                 isSpectator,
                 currentTurn: gameState.currentTurn,
@@ -335,6 +347,8 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
       
         if (adjustedCurrentTurn !== 0 || isSpectator) {
           console.log('❌ Card click blocked:', { adjustedCurrentTurn, isSpectator });
+          setActionBlockedMessage("It's not your turn or you are a spectator.");
+          setTimeout(() => setActionBlockedMessage(''), 2000);
           return;
         }
       
@@ -352,6 +366,8 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
             payload: { cardIndex }
           });
         } else {
+          setActionBlockedMessage("You must draw a card before discarding.");
+          setTimeout(() => setActionBlockedMessage(''), 2000);
           console.log('❌ Cannot discard: hasDrawnCard is false');
         }
       }, [gameState.hasDrawnCard, adjustedCurrentTurn, socket, tableId, hitMode, isSpectator, reorderedPlayers]);
@@ -366,7 +382,8 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
         });
       
         if (isSpectator) {
-          console.log('❌ Action blocked: is spectator');
+          setActionBlockedMessage("Spectators cannot perform actions.");
+          setTimeout(() => setActionBlockedMessage(''), 2000);
           return;
         }
       
@@ -456,6 +473,12 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
     return (
         <GameErrorBoundary>
             <div className="game-container flex flex-col min-h-screen bg-darkBackground text-lightText font-sans">
+                {actionBlockedMessage && (
+                    <div className="fixed top-4 left-1/2 -translate-x-1/2 bg-red-600 text-white p-3 rounded-lg shadow-lg z-50 animate-fade-in-out">
+                        {actionBlockedMessage}
+                    </div>
+                )}
+
                 {hitMode && !isSpectator && (
                     <div className="hit-mode-message fixed top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-secondary text-darkText p-md rounded-xl shadow-medium text-lg font-bold tracking-wide border-2 border-accentGold animate-pulse z-overlay">
                         <div className="hit-stage-indicator">
@@ -524,6 +547,9 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                                    isSpectator={isSpectator}
                                    showActions={false} // Actions are separate for mobile
                                    handScore={null} // AI/Other players don't show score
+                                   validHitSpreads={hitMode && selectedCard !== null ? reorderedSpreads.map(playerSpreads =>
+                                     playerSpreads.map(spread => isValidHit(reorderedHands[0][selectedCard], spread))
+                                   ) : []}
                                />
                            );
                        })}
@@ -578,6 +604,9 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                            isSpectator={isSpectator}
                            showActions={showPlayerActions} // Show actions for the current player
                            handScore={currentPlayerHandScore} // Show score for current player
+                           validHitSpreads={hitMode && selectedCard !== null ? reorderedSpreads.map(playerSpreads =>
+                             playerSpreads.map(spread => isValidHit(reorderedHands[0][selectedCard], spread))
+                           ) : []}
                        />
 
                    </div>
@@ -645,6 +674,9 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                                    isSpectator={isSpectator}
                                    showActions={showActions}
                                    handScore={isCurrentPlayer ? currentPlayerHandScore : null} // Show score only for the current player
+                                   validHitSpreads={hitMode && selectedCard !== null ? reorderedSpreads.map(playerSpreads =>
+                                     playerSpreads.map(spread => isValidHit(reorderedHands[0][selectedCard], spread))
+                                   ) : []}
                                />
                            );
                        })}
@@ -681,6 +713,9 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                         socket={socket}
                         isSpectator={isSpectator}
                         user={user}
+                        // Pass additional details for game end overlay
+                        finalScores={playerScores}
+                        reason={gameState.gameEndReason} // Assuming a gameEndReason field
                     />
                 )}
             </div>

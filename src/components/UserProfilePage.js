@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { UserContext } from './UserContext';
@@ -12,6 +12,7 @@ const UserProfilePage = () => {
   const [pageLoading, setPageLoading] = useState(true);
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [gameHistory, setGameHistory] = useState([]);
+  const chipCountRef = useRef(null);
   const [stats, setStats] = useState({
     gamesPlayed: 0,
     wins: 0,
@@ -67,10 +68,17 @@ const UserProfilePage = () => {
       .slice(0, 5);
   }, [gameHistory]);
 
-  if (loading || !user) {
+  if (pageLoading || !user) {
     return (
       <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center">
-        <div className="text-xl text-blue-400">Loading profile data...</div>
+        <div className="text-xl text-blue-400">
+          <div className="animate-pulse">Loading profile data...</div>
+          <div className="mt-4 space-y-4">
+            <div className="h-6 bg-gray-700 rounded w-3/4 mx-auto"></div>
+            <div className="h-6 bg-gray-700 rounded w-1/2 mx-auto"></div>
+            <div className="h-6 bg-gray-700 rounded w-2/3 mx-auto"></div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -83,6 +91,13 @@ const UserProfilePage = () => {
       });
       updateUserChips(response.data.chips);
       setFeedbackMessage(`Successfully purchased ${amount} chips!`);
+      // Trigger animation
+      if (chipCountRef.current) {
+        chipCountRef.current.classList.add('animate-chip-pulse');
+        setTimeout(() => {
+          chipCountRef.current.classList.remove('animate-chip-pulse');
+        }, 1000); // Animation duration
+      }
     } catch (error) {
       setFeedbackMessage('Failed to purchase chips. Please try again.');
     }
@@ -99,7 +114,7 @@ const UserProfilePage = () => {
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 sm:mb-0 relative z-10">Welcome back, {user.username}!</h1>
           <div className="flex items-center space-x-3 bg-white bg-opacity-20 rounded-full px-5 py-2 shadow-md relative z-10">
             <span className="text-3xl text-yellow-300"><CasinoChip /></span>
-            <span className="text-2xl font-bold text-white">{user.chips}</span>
+            <span ref={chipCountRef} className="text-2xl font-bold text-white transition-all duration-300 ease-out">{user.chips}</span>
           </div>
         </div>
 
@@ -148,10 +163,18 @@ const UserProfilePage = () => {
             <div className="space-y-3 mt-5">
               {recentGames.length > 0 ? (
                 recentGames.map((game, index) => (
-                  <div key={index} className="flex justify-between items-center bg-gray-600 p-4 rounded-lg shadow-sm">
-                    <span className={`font-semibold ${game.result === 'Win' ? 'text-green-400' : 'text-red-400'}`}>{game.result}</span>
-                    <span className="font-medium text-yellow-300">${game.earnings}</span>
-                    <span className="text-sm text-gray-400">{new Date(game.date).toLocaleDateString()}</span>
+                  <div key={index} className="flex flex-col sm:flex-row justify-between items-center bg-gray-600 p-4 rounded-lg shadow-sm">
+                    <div className="flex items-center space-x-2 mb-2 sm:mb-0">
+                      <span className={`font-semibold ${game.result === 'Win' ? 'text-green-400' : 'text-red-400'}`}>{game.result}</span>
+                      <span className="text-sm text-gray-400">({game.gameId})</span>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <span className="font-medium text-yellow-300">${game.earnings}</span>
+                      <span className="text-sm text-gray-400">{new Date(game.date).toLocaleDateString()}</span>
+                      {game.opponentNames && (
+                        <span className="text-sm text-gray-400">vs. {game.opponentNames.join(', ')}</span>
+                      )}
+                    </div>
                   </div>
                 ))
               ) : (
@@ -161,10 +184,10 @@ const UserProfilePage = () => {
           </section>
 
           <section className="lg:col-span-3 flex flex-col sm:flex-row justify-center gap-4 bg-gray-700 rounded-lg shadow-md p-6">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:-translate-y-1 shadow-lg" onClick={() => navigate('/lobby')}>
+            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:-translate-y-1 shadow-lg w-full sm:w-auto" onClick={() => navigate('/lobby')}>
               Play Now
             </button>
-            <button className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:-translate-y-1 shadow-lg" onClick={() => navigate('/leaderboard')}>
+            <button className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:-translate-y-1 shadow-lg w-full sm:w-auto" onClick={() => navigate('/leaderboard')}>
               View Leaderboard
             </button>
           </section>

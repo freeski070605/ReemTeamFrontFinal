@@ -35,10 +35,15 @@ const TableComponent = () => {
     hasDrawnCard: false,
     gameOver: false,
     isLoading: true,
-    error: null,
-    gameStarted: false,
     isInitialized: false,
-    connectionStatus: 'connecting'
+    gameStarted: false,
+    connectionStatus: 'connecting',
+    error: null,
+    message: null, // Added for general messages
+    gameStartingCountdown: null, // Added for countdown
+    transitionActive: false, // Added for transition state
+    readyForNewHand: false, // Added for new hand readiness
+    timestamp: Date.now() // Added to force re-renders when state changes
   });
 
   const isPlayerSeated = gameState.players.some(p => p.username === user?.username);
@@ -59,6 +64,7 @@ const TableComponent = () => {
         estimatedTime: data.estimatedTime,
         gameState: data.gameState
       });
+      setGameState(prev => ({ ...prev, message: data.message, timestamp: Date.now() }));
     };
 
     const handlePlayerModeActivated = async (data) => {
@@ -178,7 +184,7 @@ const TableComponent = () => {
       socket.off('transition_completed', handleTransitionCompleted);
       socket.off('promoted_to_player', handlePromotedToPlayer);
     };
-  }, [socket]);
+  }, [socket, tableId, setGameState]);
 
   useEffect(() => {
     if (hasJoinedRef.current) return;
@@ -212,7 +218,9 @@ const TableComponent = () => {
                 currentTurn: data.table.gameState?.currentTurn ?? 0,
                 isLoading: false,
                 isInitialized: true,
-                connectionStatus: 'connected'
+                connectionStatus: 'connected',
+                gameStarted: data.table.gameStarted || false, // Initialize gameStarted
+                gameStartingCountdown: data.table.gameStartingCountdown || null // Initialize countdown
             }));
             
             // Enhanced join logic - let backend determine player vs spectator status
@@ -297,7 +305,7 @@ const TableComponent = () => {
       console.log('Connection restored after disconnect, attempting reconnection...');
       attemptReconnection();
     }
-  }, [isConnected, manualLeave, hasJoined, user, gameState.connectionStatus]);
+  }, [isConnected, manualLeave, hasJoined, user, gameState.connectionStatus, tableId, isPlayerSeated, socket]);
   
 
   
@@ -328,23 +336,36 @@ const TableComponent = () => {
     );
   }
 
-  // --- SpectatorMode is now disabled: always show the main gameboard for all users ---
-  // if (isSpectatorMode && spectatorData) {
-  //   return (
-  //     <GameContext.Provider value={{ gameState, setGameState }}>
-  //       <GameErrorBoundary>
-  //         <SpectatorMode
-  //           gameState={spectatorData.gameState || gameState}
-  //           message={spectatorData.message}
-  //           transitionId={spectatorData.transitionId}
-  //           willJoinNextHand={spectatorData.willJoinNextHand}
-  //           estimatedTime={spectatorData.estimatedTime}
-  //           onLeaveSpectator={leaveTable}
-  //         />
-  //       </GameErrorBoundary>
-  //     </GameContext.Provider>
-  //   );
-  // }
+  if (isSpectatorMode && spectatorData) {
+    const spectatorMessage = spectatorData.message || "You are currently in spectator mode.";
+    let detailedSpectatorReason = "";
+
+    if (spectatorData.message.includes("table is full")) {
+      detailedSpectatorReason = "The table is currently full. You will join the next available spot.";
+    } else if (spectatorData.message.includes("not enough chips")) {
+      detailedSpectatorReason = `You don't have enough chips for this table's stake ($${gameState.stake}).`;
+    } else if (spectatorData.message.includes("game in progress")) {
+      detailedSpectatorReason = "A game is currently in progress. You will join the next hand.";
+    } else {
+      detailedSpectatorReason = "You are observing the current game.";
+    }
+
+    return (
+      <GameContext.Provider value={{ gameState, setGameState }}>
+        <GameErrorBoundary>
+          <SpectatorMode
+            gameState={spectatorData.gameState || gameState}
+            message={spectatorMessage}
+            detailedReason={detailedSpectatorReason} // Pass detailed reason
+            transitionId={spectatorData.transitionId}
+            willJoinNextHand={spectatorData.willJoinNextHand}
+            estimatedTime={spectatorData.estimatedTime}
+            onLeaveSpectator={leaveTable}
+          />
+        </GameErrorBoundary>
+      </GameContext.Provider>
+    );
+  }
 
   if (!Array.isArray(gameState.players) || gameState.players.length === 0) return <div>Waiting for players...</div>;
 
@@ -352,35 +373,39 @@ const TableComponent = () => {
     <GameContext.Provider value={{ gameState, setGameState }}>
       <GameErrorBoundary> 
         {/* Connection Status */}
-            <div className="connection-indicator">
-              <span className={`status ${socket && socket.connected ? 'connected' : 'disconnected'}`}>
+            <div className="connection-indicator fixed top-4 left-4 z-50 p-2 rounded-md shadow-lg text-sm font-semibold">
+              <span className={`status ${socket && socket.connected ? 'text-green-400 bg-gray-800' : 'text-red-400 bg-gray-800'} px-3 py-1 rounded-full`}>
                 {socket && socket.connected ? '🟢 Connected' : '🔴 Disconnected'}
               </span>
+              {!isConnected && (
+                <p className="text-red-300 mt-1">Connection lost. Attempting to reconnect...</p>
+              )}
             </div>
         <div className="table-wrapper" style={{ position: 'relative', overflow: 'visible', minHeight: '100vh' }}>
           {/* Transition banner overlays the table, does not cover gameboard */}
           {transitionStatus && (
-            <div className="transition-banner">
-              <div className="transition-message">
+            <div className="transition-banner fixed top-0 left-0 w-full bg-blue-800 text-white text-center p-3 z-40 shadow-lg">
+              <div className="transition-message text-lg font-semibold">
                 🔄 {transitionStatus.message}
                 {transitionStatus.estimatedTime && (
-                  <span className="transition-time">
-                    (≈{Math.round(transitionStatus.estimatedTime / 60)} min remaining)
+                  <span className="transition-time ml-2 text-blue-200">
+                    (Est. {Math.round(transitionStatus.estimatedTime)}s remaining)
                   </span>
                 )}
               </div>
             </div>
-          )} 
+          )}
           
           {/* Indicators and Leave Button */}
           {/* <div className="game-indicators-and-actions"> */}
             {/* Show waiting message with countdown for new tables */}
-            {!gameState.gameStarted && !gameState.gameOver && isPlayerSeated && (
-              <div className="waiting-status">
+            {!gameState.gameStarted && !gameState.gameOver && isPlayerSeated && gameState.players.length < 4 && (
+              <div className="waiting-status fixed top-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-lightText p-3 rounded-lg shadow-xl z-30">
+                <p className="text-lg font-semibold mb-2">Waiting for players...</p>
                 {autoStartCountdown !== null ? (
-                  <>🎮 Game starting in {autoStartCountdown}s...</>
+                  <p className="text-accentGold">🎮 Game starting in {autoStartCountdown}s...</p>
                 ) : (
-                  <>🎮 Game will start automatically...</>
+                  <p className="text-gray-400">Invite friends or wait for more players to join this table.</p>
                 )}
               </div>
             )}
