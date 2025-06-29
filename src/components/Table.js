@@ -373,7 +373,7 @@ const TableComponent = () => {
     <GameContext.Provider value={{ gameState, setGameState }}>
       <GameErrorBoundary> 
         {/* Connection Status */}
-            <div className="connection-indicator fixed top-4 left-4 z-50 p-2 rounded-md shadow-lg text-sm font-semibold">
+            <div className="connection-indicator fixed bottom-4 left-4 z-50 p-2 rounded-md shadow-lg text-sm font-semibold">
               <span className={`status ${gameState.connectionStatus === 'connected' ? 'text-green-400 bg-gray-800' : 'text-red-400 bg-gray-800'} px-3 py-1 rounded-full`}>
                 {gameState.connectionStatus === 'connected' ? '🟢 Connected' : '🔴 Disconnected'}
               </span>
