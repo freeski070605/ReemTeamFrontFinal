@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import GameEndOverlay from './GameEndOverlay';
+import Gameboard from './Gameboard'; // Import the Gameboard component
 import './SpectatorMode.css';
 
 const SpectatorMode = ({
   gameState,
+  setGameState, // Add setGameState prop
   message,
-  detailedReason, // New prop for detailed reason
+  detailedReason,
   transitionId,
   willJoinNextHand,
   estimatedTime,
@@ -49,66 +51,6 @@ const SpectatorMode = ({
     return message || 'Spectating current game';
   };
 
-  const renderGameBoard = () => {
-    if (!gameState || !gameState.players) {
-      return (
-        <div className="spectator-waiting">
-          <div className="waiting-message">Waiting for game to start...</div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="spectator-game-view">
-        <div className="spectator-players">
-          {gameState.players.map((player, index) => (
-            <div key={index} className={`spectator-player ${gameState.currentTurn === index ? 'active' : ''}`}>
-              <div className="player-info">
-                <span className="player-name">{player.username}</span>
-                {!player.isHuman && <span className="ai-badge">AI</span>}
-              </div>
-              <div className="player-cards">
-                <span className="card-count">
-                  {gameState.playerHands?.[index]?.length || 0} cards
-                </span>
-              </div>
-              {gameState.playerSpreads?.[index] && gameState.playerSpreads[index].length > 0 && (
-                <div className="player-spreads">
-                  <span className="spread-count">
-                    {gameState.playerSpreads[index].length} spread(s)
-                  </span>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="spectator-center">
-          <div className="deck-info">
-            <div className="deck-count">
-              Deck: {gameState.deck?.length || 0} cards
-            </div>
-            {gameState.discardPile && gameState.discardPile.length > 0 && (
-              <div className="discard-top">
-                Last discard: {gameState.discardPile[gameState.discardPile.length - 1]?.rank} of {gameState.discardPile[gameState.discardPile.length - 1]?.suit}
-              </div>
-            )}
-          </div>
-          
-          <div className="game-status">
-            {gameState.gameOver ? (
-              <div className="game-over">Game Over</div>
-            ) : (
-              <div className="current-turn">
-                {gameState.players[gameState.currentTurn]?.username}'s turn
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="spectator-mode">
       <div className="spectator-header">
@@ -127,7 +69,7 @@ const SpectatorMode = ({
           </div>
         )}
         
-        <button 
+        <button
           className="leave-spectator-btn"
           onClick={onLeaveSpectator}
         >
@@ -136,16 +78,29 @@ const SpectatorMode = ({
       </div>
 
       <div className="spectator-content">
-        {renderGameBoard()}
+        {/* Render the full Gameboard component for spectators */}
+        {gameState && gameState.players ? (
+          <Gameboard
+            tableId={tableId}
+            gameState={gameState}
+            setGameState={setGameState}
+            user={user}
+            isSpectator={true} // Explicitly pass isSpectator as true
+          />
+        ) : (
+          <div className="spectator-waiting">
+            <div className="waiting-message">Waiting for game to start...</div>
+          </div>
+        )}
       </div>
 
       {timeRemaining > 0 && (
         <div className="time-remaining">
           <div className="time-bar">
-            <div 
-              className="time-progress" 
-              style={{ 
-                width: `${((estimatedTime - timeRemaining) / estimatedTime) * 100}%` 
+            <div
+              className="time-progress"
+              style={{
+                width: `${((estimatedTime - timeRemaining) / estimatedTime) * 100}%`
               }}
             ></div>
           </div>
