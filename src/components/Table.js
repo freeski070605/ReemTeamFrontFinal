@@ -374,11 +374,19 @@ const TableComponent = () => {
       <GameErrorBoundary> 
         {/* Connection Status */}
             <div className="connection-indicator fixed top-4 left-4 z-50 p-2 rounded-md shadow-lg text-sm font-semibold">
-              <span className={`status ${socket && socket.connected ? 'text-green-400 bg-gray-800' : 'text-red-400 bg-gray-800'} px-3 py-1 rounded-full`}>
-                {socket && socket.connected ? '🟢 Connected' : '🔴 Disconnected'}
+              <span className={`status ${gameState.connectionStatus === 'connected' ? 'text-green-400 bg-gray-800' : 'text-red-400 bg-gray-800'} px-3 py-1 rounded-full`}>
+                {gameState.connectionStatus === 'connected' ? '🟢 Connected' : '🔴 Disconnected'}
               </span>
-              {!isConnected && (
-                <p className="text-red-300 mt-1">Connection lost. Attempting to reconnect...</p>
+              {gameState.connectionStatus !== 'connected' && gameState.error && (
+                <p className="text-red-300 mt-1">{gameState.error}</p>
+              )}
+              {gameState.connectionStatus !== 'connected' && (
+                <button
+                  onClick={leaveTable}
+                  className="mt-2 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
+                >
+                  Return to Lobby
+                </button>
               )}
             </div>
         <div className="table-wrapper" style={{ position: 'relative', overflow: 'visible', minHeight: '100vh' }}>

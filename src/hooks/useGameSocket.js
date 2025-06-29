@@ -19,6 +19,7 @@ export const useGameSocket = (socket, tableId, user, gameState, setGameState) =>
       console.log('🟢 Socket connected — requesting state sync:', tableId);
       reconnectAttempts.current = 0;
       socket.emit('request_state_sync', { tableId });
+      updateGameState(prev => ({ ...prev, error: null, connectionStatus: 'connected' })); // Clear error and confirm connected status
     };
 
     const syncInterval = setInterval(() => {
@@ -239,6 +240,7 @@ export const useGameSocket = (socket, tableId, user, gameState, setGameState) =>
     };
   }, [socket, tableId, user?.username]);
 };
+
 
 export const useSocketConnection = (socket) => {
   const [isConnected, setIsConnected] = useState(socket?.connected || false);
