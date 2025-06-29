@@ -377,9 +377,6 @@ const TableComponent = () => {
               <span className={`status ${gameState.connectionStatus === 'connected' ? 'text-green-400 bg-gray-800' : 'text-red-400 bg-gray-800'} px-3 py-1 rounded-full`}>
                 {gameState.connectionStatus === 'connected' ? '🟢 Connected' : '🔴 Disconnected'}
               </span>
-              {gameState.connectionStatus !== 'connected' && gameState.error && (
-                <p className="text-red-300 mt-1">{gameState.error}</p>
-              )}
               {gameState.connectionStatus !== 'connected' && (
                 <button
                   onClick={leaveTable}

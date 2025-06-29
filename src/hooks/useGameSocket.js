@@ -167,7 +167,7 @@ export const useGameSocket = (socket, tableId, user, gameState, setGameState) =>
       updateGameState(prev => ({
         ...prev,
         connectionStatus: 'disconnected',
-        error: 'Connection lost. Attempting to reconnect...'
+        error: null // Remove the specific message
       }));
     };
 
@@ -177,7 +177,7 @@ export const useGameSocket = (socket, tableId, user, gameState, setGameState) =>
         updateGameState(prev => ({
           ...prev,
           connectionStatus: 'reconnecting',
-          error: `Reconnecting... (${attemptNumber}/${maxReconnectAttempts})`
+          error: null // Remove the specific message
         }));
       }
     };
