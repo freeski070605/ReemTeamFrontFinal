@@ -1,12 +1,19 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
+const rankToFilenameMap = {
+    'ace': 'ace', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9', '10': '10',
+    'J': 'j', 'Q': 'Q', 'K': 'K',
+};
+
 const DiscardPile = ({ cards, onClick, isActive, className, cardSizeClass }) => {
     const validCards = Array.isArray(cards) ? cards : [];
     const topCard = validCards.length > 0 ? validCards[validCards.length - 1] : null;
     
+    const filenameRank = topCard ? (rankToFilenameMap[topCard.rank] || topCard.rank) : '';
+
     return (
-        <div 
+        <div
             className={`relative flex items-center justify-center transition-transform duration-200 ease-in
                         ${isActive ? 'cursor-pointer hover:scale-105' : 'cursor-default opacity-70'}
                         ${className}`}
@@ -23,7 +30,7 @@ const DiscardPile = ({ cards, onClick, isActive, className, cardSizeClass }) => 
                         {validCards.length}
                     </div>
                     <img
-                        src={`${process.env.REACT_APP_PUBLIC_URL}assets/cards/${topCard.rank}_of_${topCard.suit}.png`}
+                        src={`${process.env.REACT_APP_PUBLIC_URL}assets/cards/${filenameRank}_of_${topCard.suit}.png`}
                         alt={topCard ? `${topCard.rank} of ${topCard.suit}` : 'Discard Pile Card'}
                         className={`w-full h-full object-contain rounded-md shadow-md ${cardSizeClass}`}
                     />

@@ -2,6 +2,11 @@ import React from 'react';
 import { PLAYER_POSITIONS } from './gameConstants';
 import PropTypes from 'prop-types'; // Import PropTypes
 
+const rankToFilenameMap = {
+  'ace': 'ace', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9', '10': '10',
+  'J': 'j', 'Q': 'Q', 'K': 'K',
+};
+
 const PlayerSpreads = ({
   spreads,
   onSpreadClick,
@@ -60,18 +65,21 @@ const PlayerSpreads = ({
                                   ${isHitModeActive && selectedCard !== null && !isSpectator ? 'border-primary' : ''}`}
                       onClick={(event) => handleSpreadClick(spreadIndex, event)}
                   >
-                      {spread.map((card, cardIndex) => (
-                          <div
-                              key={`${card.rank}-${card.suit}-${cardIndex}`}
-                              className="w-16 max-w-[90px] min-w-12 relative rounded-md shadow-sm"
-                          >
-                              <img
-                                  src={`${process.env.REACT_APP_PUBLIC_URL}assets/cards/${card.rank}_of_${card.suit}.png`}
-                                  alt={`${card.rank} of ${card.suit}`}
-                                  className="w-full h-auto rounded-md shadow-sm bg-cardBackground transition-all duration-200 ease-in-out"
-                              />
-                          </div>
-                      ))}
+                      {spread.map((card, cardIndex) => {
+                          const filenameRank = rankToFilenameMap[card.rank] || card.rank;
+                          return (
+                              <div
+                                  key={`${card.rank}-${card.suit}-${cardIndex}`}
+                                  className="w-16 max-w-[90px] min-w-12 relative rounded-md shadow-sm"
+                              >
+                                  <img
+                                      src={`${process.env.REACT_APP_PUBLIC_URL}assets/cards/${filenameRank}_of_${card.suit}.png`}
+                                      alt={`${card.rank} of ${card.suit}`}
+                                      className="w-full h-auto rounded-md shadow-sm bg-cardBackground transition-all duration-200 ease-in-out"
+                                  />
+                              </div>
+                          );
+                      })}
                   </div>
               ))}
           </div>
