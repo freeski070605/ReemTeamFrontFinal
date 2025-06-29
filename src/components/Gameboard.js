@@ -498,7 +498,7 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                                    spreads={reorderedSpreads[index] || []}
                                    isCurrentTurn={adjustedCurrentTurn === index}
                                    hasDrawnCard={gameState.hasDrawnCard}
-                                   isHidden={true} // Hide other players' hands on mobile
+                                   isHidden={!isCurrentPlayer && isSpectator} // Hide other players' hands if not current player and is spectator
                                    onDrop={handleDrop}
                                    hitMode={hitMode}
                                    selectedCard={selectedCard}
@@ -619,7 +619,7 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                                    spreads={reorderedSpreads[index] || []}
                                    isCurrentTurn={isCurrentTurn}
                                    hasDrawnCard={gameState.hasDrawnCard}
-                                   isHidden={position !== 'bottom'} // Hide other players' hands
+                                   isHidden={!isCurrentPlayer && isSpectator} // Hide other players' hands if not current player and is spectator
                                    onDrop={handleDrop}
                                    hitMode={hitMode}
                                    selectedCard={selectedCard}
