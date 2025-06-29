@@ -368,11 +368,6 @@ const TableComponent = () => {
           
           {/* Indicators and Leave Button */}
           {/* <div className="game-indicators-and-actions"> */}
-            <div className={`connection-status ${gameState.connectionStatus || (isConnected ? 'connected' : 'disconnected')}`}>
-              {connectionStatus}
-            </div>
-            
-           
             {/* Show waiting message with countdown for new tables */}
             {!gameState.gameStarted && !gameState.gameOver && isPlayerSeated && (
               <div className="waiting-status">
@@ -404,6 +399,12 @@ const TableComponent = () => {
             />
           </div>
           
+           {/* Connection Status */}
+      <div className="connection-indicator">
+        <span className={`status ${socket && socket.connected ? 'connected' : 'disconnected'}`}>
+          {socket && socket.connected ? '🟢 Connected' : '🔴 Disconnected'}
+        </span>
+      </div>
 
          
         </div>

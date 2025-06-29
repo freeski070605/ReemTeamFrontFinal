@@ -66,7 +66,7 @@ const PlayerSpreads = ({
                               className="w-16 max-w-[90px] min-w-12 relative rounded-md shadow-sm"
                           >
                               <img
-                                  src={`${process.env.PUBLIC_URL}/assets/cards/${card.rank}_of_${card.suit}.png`}
+                                  src={`${process.env.REACT_APP_PUBLIC_URL}assets/cards/${card.rank}_of_${card.suit}.png`}
                                   alt={`${card.rank} of ${card.suit}`}
                                   className="w-full h-auto rounded-md shadow-sm bg-cardBackground transition-all duration-200 ease-in-out"
                               />

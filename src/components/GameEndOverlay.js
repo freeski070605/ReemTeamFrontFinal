@@ -212,63 +212,63 @@ const userIsPlayer = isCurrentUserPlayer();
    
 
 return (
-    <div className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50 backdrop-blur-sm">
-        <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-2xl shadow-2xl max-w-2xl w-11/12 text-white border border-gray-700">
-            <h2 className="text-center text-4xl font-extrabold mb-6 text-yellow-400 drop-shadow-lg">{getWinMessage()}</h2>
-            
-            {process.env.NODE_ENV === 'development' && (
-                <div className="text-xs text-gray-400 my-4 p-2 bg-gray-700 rounded">
-                    Debug: User: {user?.username} | Players: {players.map(p => p?.username).join(', ')} | IsPlayer: {userIsPlayer.toString()}
-                </div>
-            )}
-            
-            <div className="mb-6">
-                <h3 className="text-2xl font-bold mb-4 text-center text-gray-200">Final Scores (Hand Cards Only)</h3>
-                <div className="bg-gray-800 p-4 rounded-lg shadow-inner">
-                    {players.map((player, index) => (
-                        <ScoreDisplay
-                            key={`${player.username}-${index}-${gameState?.timestamp || Date.now()}`}
-                            player={player}
-                            index={index}
-                            score={calculatePlayerScore(index)}
-                            isWinner={winners.includes(index)}
-                        />
-                    ))}
-                </div>
-            </div>
+            <div className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50 backdrop-blur-sm p-4">
+                <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl shadow-2xl max-w-xl w-full text-white border border-gray-700 max-h-[90vh] overflow-y-auto">
+                    <h2 className="text-center text-3xl font-extrabold mb-4 text-yellow-400 drop-shadow-lg">{getWinMessage()}</h2>
 
-            <div className="mb-8">
-                <h3 className="text-2xl font-bold mb-4 text-center text-gray-200">Pot Details</h3>
-                <div className="bg-gray-800 p-4 rounded-lg shadow-inner text-center">
-                    <p className="text-lg mb-2">Table Stake: <span className="font-semibold text-yellow-300">{stake}</span> chips</p>
-                    <p className="text-lg mb-2">Total Pot: <span className="font-semibold text-yellow-300">{stake * players.length}</span> chips</p>
-                    {winType === 'REEM' && <p className="text-xl font-bold text-green-400 animate-pulse">REEM Bonus: Double pot!</p>}
-                    {winType === '50' && <p className="text-xl font-bold text-green-400 animate-pulse">50 Bonus: Double pot!</p>}
-                    {winType === '41or11' && <p className="text-xl font-bold text-green-400 animate-pulse">41 or 11 Bonus: Triple pot!</p>}
-                    {winType === 'DROP_CAUGHT' && <p className="text-xl font-bold text-red-400 animate-pulse">Drop Penalty: Double stake from dropper</p>}
-                </div>
-            </div>
+                    {process.env.NODE_ENV === 'development' && (
+                        <div className="text-xs text-gray-400 mb-4 p-2 bg-gray-700 rounded">
+                            Debug: User: {user?.username} | Players: {players.map(p => p?.username).join(', ')} | IsPlayer: {userIsPlayer.toString()}
+                        </div>
+                    )}
 
-            <div className="flex justify-center gap-6 mt-8">
-                <button
-                    className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={handlePlayAgain}
-                    disabled={(!userIsPlayer && !isSpectator) || hasPlayerReadied}
-                >
-                    {hasPlayerReadied ? 'Waiting for game...' : (isSpectator ? 'Ready to Join' : 'Play Again')}
-                </button>
-                {countdown > 0 && !hasPlayerReadied && (
-                    <div className="flex items-center text-lg text-gray-300">
-                        Auto-starting in <span className="font-bold text-yellow-400 ml-2">{countdown}s</span>
+                    <div className="mb-4">
+                        <h3 className="text-xl font-bold mb-3 text-center text-gray-200">Final Scores (Hand Cards Only)</h3>
+                        <div className="bg-gray-800 p-3 rounded-lg shadow-inner">
+                            {players.map((player, index) => (
+                                <ScoreDisplay
+                                    key={`${player.username}-${index}-${gameState?.timestamp || Date.now()}`}
+                                    player={player}
+                                    index={index}
+                                    score={calculatePlayerScore(index)}
+                                    isWinner={winners.includes(index)}
+                                />
+                            ))}
+                        </div>
                     </div>
-                )}
-                <button
-                    className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105"
-                    onClick={handleLeaveTable}
-                >
-                    Leave Table
-                </button>
-            </div>
+
+                    <div className="mb-6">
+                        <h3 className="text-xl font-bold mb-3 text-center text-gray-200">Pot Details</h3>
+                        <div className="bg-gray-800 p-3 rounded-lg shadow-inner text-center">
+                            <p className="text-base mb-1">Table Stake: <span className="font-semibold text-yellow-300">{stake}</span> chips</p>
+                            <p className="text-base mb-1">Total Pot: <span className="font-semibold text-yellow-300">{stake * players.length}</span> chips</p>
+                            {winType === 'REEM' && <p className="text-lg font-bold text-green-400 animate-pulse mt-2">REEM Bonus: Double pot!</p>}
+                            {winType === '50' && <p className="text-lg font-bold text-green-400 animate-pulse mt-2">50 Bonus: Double pot!</p>}
+                            {winType === '41or11' && <p className="text-lg font-bold text-green-400 animate-pulse mt-2">41 or 11 Bonus: Triple pot!</p>}
+                            {winType === 'DROP_CAUGHT' && <p className="text-lg font-bold text-red-400 animate-pulse mt-2">Drop Penalty: Double stake from dropper</p>}
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row justify-center gap-4 mt-6">
+                        <button
+                            className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed text-base"
+                            onClick={handlePlayAgain}
+                            disabled={(!userIsPlayer && !isSpectator) || hasPlayerReadied}
+                        >
+                            {hasPlayerReadied ? 'Waiting for game...' : (isSpectator ? 'Ready to Join' : 'Play Again')}
+                        </button>
+                        {countdown > 0 && !hasPlayerReadied && (
+                            <div className="flex items-center text-base text-gray-300 justify-center sm:justify-start">
+                                Auto-starting in <span className="font-bold text-yellow-400 ml-2">{countdown}s</span>
+                            </div>
+                        )}
+                        <button
+                            className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 text-base"
+                            onClick={handleLeaveTable}
+                        >
+                            Leave Table
+                        </button>
+                    </div>
         </div>
     </div>
 );

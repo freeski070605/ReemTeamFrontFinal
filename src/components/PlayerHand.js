@@ -35,10 +35,8 @@ const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selec
     };
 
     return (
-        <div className="flex justify-center items-center w-full max-w-full p-0 overflow-visible relative z-2 min-h-[200px] rounded-lg pb-8"> {/* Increased min-h and added pb-4 */}
-            <div className="flex flex-row flex-nowrap items-center gap-2 w-full min-w-0 max-w-full h-auto m-0 p-0 justify-center overflow-x-auto overscroll-x-contain scrollbar-hide
-                            sm:flex-wrap sm:overflow-x-hidden sm:h-auto sm:gap-3
-                            lg:flex-nowrap lg:overflow-x-visible lg:h-auto lg:gap-2 w-full max-w-full">
+        <div className="flex justify-center items-center w-full max-w-full p-0 overflow-hidden relative z-2 min-h-[200px] rounded-lg pb-8">
+            <div className="flex flex-row flex-wrap items-center gap-2 w-full min-w-0 max-w-full h-auto m-0 p-0 justify-center">
                 {sortedCards.map((card, i) => {
                     const total = sortedCards.length;
                     const spread = Math.min(90, total * 12);
@@ -49,7 +47,7 @@ const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selec
 
                     const cardClasses = `
                         flex-shrink-0 cursor-pointer transition-all duration-200 ease-in-out transform-gpu
-                        w-16 max-w-[90px] min-w-12 rounded-md bg-cardBackground shadow-sm border-2 border-transparent relative z-10
+                        w-20 max-w-[90px] min-w-12 rounded-md bg-cardBackground shadow-sm border-2 border-transparent relative z-10
                         hover:scale-110 hover:-translate-y-2 hover:shadow-lg hover:border-accentGold hover:z-30
                         ${isActive ? 'pointer-events-auto' : 'pointer-events-none'}
                         ${selectedCard === card.originalIndex ? 'scale-110 -translate-y-4 shadow-xl border-accentGold z-40' : ''}
@@ -59,9 +57,6 @@ const PlayerHand = ({ cards, isActive, onCardClick, onCardSelect, hitMode, selec
                         <div
                             key={`${card.rank}-${card.suit}-${card.originalIndex}`}
                             className={cardClasses}
-                            style={{
-                                transform: `rotate(${angle}deg) translateY(${curve}px)`,
-                            }}
                             onClick={() => handleCardInteraction(card.originalIndex)}
                         >
                             <img
