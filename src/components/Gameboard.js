@@ -476,7 +476,8 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                    {/* Mobile Layout */}
                    <div className="lg:hidden mobile-game-layout">
                        {reorderedPlayers.map((player, index) => {
-                           if (index === 0) return null; // Current player rendered separately
+                           const isCurrentPlayer = index === 0; // Define isCurrentPlayer for mobile layout
+                           if (isCurrentPlayer) return null; // Current player rendered separately
                            
                            let mobilePlayerClass = `player w-full max-w-full min-h-[80px] mb-sm flex flex-col items-center justify-center p-sm rounded-md bg-darkBackground/90 shadow-sm border-1.5 border-transparent z-10 transition-all duration-300
                                                    ${adjustedCurrentTurn === index ? 'border-accentGold shadow-lg' : ''}`;
@@ -498,7 +499,7 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                                    spreads={reorderedSpreads[index] || []}
                                    isCurrentTurn={adjustedCurrentTurn === index}
                                    hasDrawnCard={gameState.hasDrawnCard}
-                                   isHidden={!isCurrentPlayer && isSpectator} // Hide other players' hands if not current player and is spectator
+                                   isHidden={!isCurrentPlayer} // Hide other players' hands
                                    onDrop={handleDrop}
                                    hitMode={hitMode}
                                    selectedCard={selectedCard}
@@ -619,7 +620,7 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                                    spreads={reorderedSpreads[index] || []}
                                    isCurrentTurn={isCurrentTurn}
                                    hasDrawnCard={gameState.hasDrawnCard}
-                                   isHidden={!isCurrentPlayer && isSpectator} // Hide other players' hands if not current player and is spectator
+                                   isHidden={!isCurrentPlayer} // Hide other players' hands
                                    onDrop={handleDrop}
                                    hitMode={hitMode}
                                    selectedCard={selectedCard}
