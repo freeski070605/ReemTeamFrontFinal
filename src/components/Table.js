@@ -378,7 +378,12 @@ const TableComponent = () => {
                 )}
               </div>
             )}
-            
+                  {/* Connection Status */}
+            <div className="connection-indicator">
+              <span className={`status ${socket && socket.connected ? 'connected' : 'disconnected'}`}>
+                {socket && socket.connected ? '🟢 Connected' : '🔴 Disconnected'}
+              </span>
+            </div>
             <button
               className="leave-button"
               onClick={leaveTable}
@@ -387,12 +392,7 @@ const TableComponent = () => {
               Leave Table
             </button>      
             
-            {/* Connection Status */}
-      <div className="connection-indicator">
-        <span className={`status ${socket && socket.connected ? 'connected' : 'disconnected'}`}>
-          {socket && socket.connected ? '🟢 Connected' : '🔴 Disconnected'}
-        </span>
-      </div>
+           
           {/* </div> */}
 
           {/* Gameboard is fully contained and never covered */}

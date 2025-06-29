@@ -32,7 +32,7 @@ const DiscardPile = ({ cards, onClick, isActive, className, cardSizeClass }) => 
                     <img
                         src={`${process.env.REACT_APP_PUBLIC_URL}assets/cards/${filenameRank}_of_${topCard.suit}.png`}
                         alt={topCard ? `${topCard.rank} of ${topCard.suit}` : 'Discard Pile Card'}
-                        className={`w-full h-full object-contain rounded-md shadow-md ${cardSizeClass}`}
+                        className={`w-full h-full object-contain rounded-sm shadow-md ${cardSizeClass}`}
                     />
                 </div>
             )}
@@ -50,7 +50,7 @@ DiscardPile.propTypes = {
 
 DiscardPile.defaultProps = {
     className: '',
-    cardSizeClass: 'w-16 aspect-[2.5/3.5]', // Default to a common card size
+    cardSizeClass: 'w-20 aspect-[2.5/3.5]', // Default to a common card size
 };
 
 export default DiscardPile;
