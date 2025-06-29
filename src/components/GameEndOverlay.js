@@ -158,6 +158,9 @@ const getWinMessage = () => {
         .map(index => players[index]?.username || 'AI Player')
         .join(', ');
 
+    const baseStake = gameState?.baseStake || 0;
+    const potSize = gameState?.potSize || 0;
+
 
     // Use the 'reason' prop if available for a more specific message
     if (reason) {
