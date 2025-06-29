@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useContext, createContext, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import GameBoard from './Gameboard';
-import SpectatorMode from './SpectatorMode';
 import { UserContext } from './UserContext';
 import ChipSystem from '../utils/ChipSystem';
 import { GameErrorBoundary } from './GameErrorBoundary';
@@ -336,38 +335,6 @@ const TableComponent = () => {
     );
   }
 
-  if (isSpectatorMode && spectatorData) {
-    const spectatorMessage = spectatorData.message || "You are currently in spectator mode.";
-    let detailedSpectatorReason = "";
-
-    if (spectatorData.message.includes("table is full")) {
-      detailedSpectatorReason = "The table is currently full. You will join the next available spot.";
-    } else if (spectatorData.message.includes("not enough chips")) {
-      detailedSpectatorReason = `You don't have enough chips for this table's stake ($${gameState.stake}).`;
-    } else if (spectatorData.message.includes("game in progress")) {
-      detailedSpectatorReason = "A game is currently in progress. You will join the next hand.";
-    } else {
-      detailedSpectatorReason = "You are observing the current game.";
-    }
-
-    return (
-      <GameContext.Provider value={{ gameState, setGameState }}>
-        <GameErrorBoundary>
-          <SpectatorMode
-            gameState={spectatorData.gameState || gameState}
-            message={spectatorMessage}
-            detailedReason={detailedSpectatorReason} // Pass detailed reason
-            transitionId={spectatorData.transitionId}
-            willJoinNextHand={spectatorData.willJoinNextHand}
-            estimatedTime={spectatorData.estimatedTime}
-            onLeaveSpectator={leaveTable}
-          />
-        </GameErrorBoundary>
-      </GameContext.Provider>
-    );
-  }
-
-  if (!Array.isArray(gameState.players) || gameState.players.length === 0) return <div>Waiting for players...</div>;
 
   return (
     <GameContext.Provider value={{ gameState, setGameState }}>
@@ -434,6 +401,7 @@ const TableComponent = () => {
               setGameState={setGameState}
               socket={socket}
               user={user}
+              isSpectator={isSpectatorMode} // Pass isSpectatorMode directly
             />
           </div>
           
