@@ -15,9 +15,9 @@ const ScoreDisplay = ({ player, index, score, isWinner }) => (
     </div>
 );
 
-const GameEndOverlay = ({
-    winners = [],
-    players = [],
+const GameEndOverlay = ({ 
+    winners = [], 
+    players = [], 
     playerHands = [],
     winType,
     caught,
@@ -28,9 +28,7 @@ const GameEndOverlay = ({
     onGameRestart,
     socket,
     isSpectator,
-    user,
-    finalScores, // New prop for final scores
-    reason // New prop for game end reason
+    user 
 }) => {
     const [countdown, setCountdown] = useState(15);
     const [hasPlayerReadied, setHasPlayerReadied] = useState(false);
@@ -158,29 +156,8 @@ const getWinMessage = () => {
         .map(index => players[index]?.username || 'AI Player')
         .join(', ');
 
-    const baseStake = gameState?.baseStake || 0;
-    const potSize = gameState?.potSize || 0;
-
-
-    // Use the 'reason' prop if available for a more specific message
-    if (reason) {
-        switch (reason) {
-            case 'TONK':
-                return `${winnerNames} wins by Tonk!`;
-            case 'STOCK_EMPTY':
-                const isMultipleWinners = winners.length > 1;
-                return `Stock Empty! ${winnerNames} ${isMultipleWinners ? 'tie' : 'wins'} with lowest points!`;
-            case 'DROP':
-                return `${winnerNames} wins by Drop!`;
-            case 'CAUGHT':
-                return `${winnerNames} caught the dropper!`;
-            case 'FORFEIT':
-                return `${winnerNames} wins by forfeit!`;
-            default:
-                return `Game Over: ${reason}`;
-        }
-    }
-
+    const baseStake = Number(stake);
+    const potSize = baseStake * players.length;
 
     switch (winType) {
         case 'DROP_CAUGHT':
@@ -238,9 +215,6 @@ return (
             <div className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50 backdrop-blur-sm p-4">
                 <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl shadow-2xl max-w-xl w-full text-white border border-gray-700 max-h-[90vh] overflow-y-auto">
                     <h2 className="text-center text-3xl font-extrabold mb-4 text-yellow-400 drop-shadow-lg">{getWinMessage()}</h2>
-                    {reason && reason !== 'TONK' && reason !== 'DROP' && reason !== 'CAUGHT' && reason !== 'FORFEIT' && (
-                        <p className="text-center text-lg text-gray-300 mb-4">Reason: {reason}</p>
-                    )}
 
                     {process.env.NODE_ENV === 'development' && (
                         <div className="text-xs text-gray-400 mb-4 p-2 bg-gray-700 rounded">
@@ -314,9 +288,7 @@ GameEndOverlay.propTypes = {
     onGameRestart: PropTypes.func,
     socket: PropTypes.object,
     isSpectator: PropTypes.bool,
-    user: PropTypes.object, // ✅ Add user prop type
-    finalScores: PropTypes.array, // Add prop type for finalScores
-    reason: PropTypes.string // Add prop type for reason
+    user: PropTypes.object // ✅ Add user prop type
 };
 
 // Provide default props
@@ -333,10 +305,9 @@ GameEndOverlay.defaultProps = {
     onGameRestart: () => {},
     socket: null,
     isSpectator: false,
-    user: null, // ✅ Add default user prop
-    finalScores: [],
-    reason: null
+    user: null // ✅ Add default user prop
 };
 
 export default GameEndOverlay;
+
 
