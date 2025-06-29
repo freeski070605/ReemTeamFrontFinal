@@ -649,7 +649,7 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                                    spreads={reorderedSpreads[index] || []}
                                    isCurrentTurn={isCurrentTurn}
                                    hasDrawnCard={gameState.hasDrawnCard}
-                                   isHidden={!isCurrentPlayer} // Hide other players' hands
+                                   isHidden={!isCurrentPlayer && isSpectator} // Hide other players' hands
                                    onDrop={handleDrop}
                                    hitMode={hitMode}
                                    selectedCard={selectedCard}
