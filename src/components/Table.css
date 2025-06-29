@@ -336,6 +336,7 @@ body {
     align-items: center;
     position: relative;
     overflow-y: auto; /* Enable vertical scrolling for game board content */
+    padding-bottom: 120px; /* Add padding to the bottom to make space for the footer */
 }
 
 /* Tablet (769px – 1024px) */
@@ -343,6 +344,7 @@ body {
     .game-board-container {
         height: calc(100vh - 90px); /* Adjusted for new footer height */
         max-width: 960px;
+        padding-bottom: 120px; /* Add padding to the bottom to make space for the footer */
     }
     .game-indicators-and-actions {
         padding: var(--spacing-md) var(--spacing-lg);
@@ -389,5 +391,41 @@ body {
         font-size: var(--font-size-sm);
         flex-direction: column;
         gap: 3px;
+    }
+}
+
+/* Mobile Landscape (max-width: 768px and orientation: landscape) */
+@media (max-width: 768px) and (orientation: landscape) {
+    .table-wrapper {
+        padding-bottom: 0; /* Ensure no extra padding in landscape */
+    }
+
+    .game-board-container {
+        height: 100vh; /* Use full viewport height */
+        width: 100vw; /* Use full viewport width */
+        overflow: hidden; /* Prevent scrolling */
+        padding: 0; /* Remove padding */
+        margin: 0;
+        max-width: none; /* Remove max-width */
+        border-radius: 0; /* Remove border-radius */
+    }
+
+    .game-indicators-and-actions {
+        position: static; /* Allow it to be part of the grid layout */
+        transform: none; /* Remove transform */
+        flex-direction: row; /* Arrange horizontally */
+        justify-content: space-around; /* Distribute items evenly */
+        width: 100%; /* Take full width */
+        padding: var(--spacing-sm);
+        border-radius: 0; /* Remove border-radius */
+        background: rgba(24, 26, 32, 0.9); /* Slightly darker background */
+        box-shadow: none; /* Remove shadow */
+        border: none; /* Remove border */
+    }
+
+    .ready-button, .ready-status, .leave-button, .connection-status, .waiting-status {
+        width: auto; /* Allow buttons to size naturally */
+        font-size: var(--font-size-xs); /* Smaller font size */
+        padding: 8px 12px; /* Smaller padding */
     }
 }

@@ -17,26 +17,25 @@
 @media (max-width: 768px) and (orientation: landscape) {
   .mobile-game-layout {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr; /* Left, Center, Right */
+    grid-template-columns: 1fr 3fr 1fr; /* Left, Center, Right - give more space to center */
     grid-template-rows: auto 1fr auto; /* Top, Middle, Bottom */
-    gap: 5px;
+    gap: 10px; /* Increase gap for better spacing */
     height: 100vh; /* Use full viewport height */
     width: 100vw; /* Use full viewport width */
     overflow: hidden; /* Prevent scrolling */
     padding: 5px;
     box-sizing: border-box;
     max-width: none; /* Remove max-width in landscape */
-    transform: scale(0.8); /* Zoom out everything */
-    transform-origin: center center; /* Ensure it scales from the center */
   }
+}
 
   .player-section-current {
     grid-column: 2 / 3;
     grid-row: 3 / 4;
     align-self: end;
     justify-self: center;
-    width: 95%;
-    max-width: 300px;
+    width: 100%; /* Allow to take full width of its grid cell */
+    max-width: 400px; /* Increase max-width for current player section */
   }
 
   .center-game-area-mobile-landscape {
@@ -44,10 +43,10 @@
     grid-row: 2 / 3;
     align-self: center;
     justify-self: center;
-    width: 90%;
-    height: 90%;
-    max-width: 250px;
-    max-height: 250px;
+    width: 100%;
+    height: 100%;
+    max-width: 350px; /* Increase max-width for center game area */
+    max-height: 350px; /* Increase max-height for center game area */
   }
 
   .player-section-top-mobile-landscape {
@@ -55,8 +54,8 @@
     grid-row: 1 / 2;
     align-self: start;
     justify-self: center;
-    width: 95%;
-    max-width: 200px;
+    width: 100%;
+    max-width: 250px; /* Increase max-width for top player section */
   }
 
   .player-section-left-mobile-landscape {
@@ -64,8 +63,8 @@
     grid-row: 2 / 3;
     align-self: center;
     justify-self: start;
-    width: 95%;
-    max-width: 200px;
+    width: 100%;
+    max-width: 250px; /* Increase max-width for left player section */
   }
 
   .player-section-right-mobile-landscape {
@@ -73,7 +72,6 @@
     grid-row: 2 / 3;
     align-self: center;
     justify-self: end;
-    width: 95%;
-    max-width: 200px;
-  }
+    width: 100%;
+    max-width: 250px; /* Increase max-width for right player section */
 }

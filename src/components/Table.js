@@ -350,7 +350,13 @@ const TableComponent = () => {
 
   return (
     <GameContext.Provider value={{ gameState, setGameState }}>
-      <GameErrorBoundary>
+      <GameErrorBoundary> 
+        {/* Connection Status */}
+            <div className="connection-indicator">
+              <span className={`status ${socket && socket.connected ? 'connected' : 'disconnected'}`}>
+                {socket && socket.connected ? '🟢 Connected' : '🔴 Disconnected'}
+              </span>
+            </div>
         <div className="table-wrapper" style={{ position: 'relative', overflow: 'visible', minHeight: '100vh' }}>
           {/* Transition banner overlays the table, does not cover gameboard */}
           {transitionStatus && (
@@ -378,12 +384,7 @@ const TableComponent = () => {
                 )}
               </div>
             )}
-                  {/* Connection Status */}
-            <div className="connection-indicator">
-              <span className={`status ${socket && socket.connected ? 'connected' : 'disconnected'}`}>
-                {socket && socket.connected ? '🟢 Connected' : '🔴 Disconnected'}
-              </span>
-            </div>
+                 
             <button
               className="leave-button"
               onClick={leaveTable}
