@@ -9,12 +9,10 @@ export const SocketProvider = ({ children }) => {
   // lastPing and currentToken are not directly managed by Colyseus client,
   // but can be derived from room state or client connection status if needed.
   const [currentUserId, setCurrentUserId] = useState(localStorage.getItem('userId'));
-  const [currentToken, setCurrentToken] = useState(localStorage.getItem('token'));
   // Memoize the event handler to ensure stable reference for useEffect cleanup
   const handleLoginSuccess = useCallback(() => {
-    console.log('loginSuccess event received in SocketContext. Updating user and token.');
+    console.log('loginSuccess event received in SocketContext. Updating user.');
     setCurrentUserId(localStorage.getItem('userId'));
-    setCurrentToken(localStorage.getItem('token'));
   }, []);
 
   useEffect(() => {

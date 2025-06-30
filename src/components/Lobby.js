@@ -61,89 +61,87 @@ const Lobby = () => {
   };
 
   const joinQueue = useCallback(async (stakeToJoin, tableId) => {
+    console.log('Attempting to join queue with:', { user, stakeToJoin, tableId, isJoiningQueue, colyseusClient });
     if (!user || !user.username || !user.chips || isJoiningQueue || !colyseusClient) {
-      console.warn('User not ready, already joining queue, or Colyseus client not available');
+      console.warn('Pre-check failed: User not ready, already joining queue, or Colyseus client not available.', { user, isJoiningQueue, colyseusClient });
       return;
     }
 
     setIsJoiningQueue(true);
+    console.log('setIsJoiningQueue set to true');
 
     try {
       // Check if user has enough chips
       if (user.chips < stakeToJoin) {
         alert(`Insufficient chips. You need $${stakeToJoin} to join this table.`);
+        setIsJoiningQueue(false); // Ensure button is re-enabled
         return;
       }
 
-      try {
-        // Attempt to join the Colyseus room
-        const room = await colyseusClient.joinOrCreate('game_room', {
-          tableId,
-          username: user.username,
-          chips: user.chips,
-        });
-        roomRef.current = room; // Store the room instance
+      console.log(`Attempting to join Colyseus room 'tonk_${stakeToJoin}' with user ${user.username}`);
+      const room = await colyseusClient.joinOrCreate(`tonk_${stakeToJoin}`, {
+        username: user.username,
+        chips: user.chips,
+        stake: stakeToJoin, // Pass stake to the room for table creation/lookup
+      });
+      roomRef.current = room; // Store the room instance
 
-        console.log(`Joined Colyseus room: ${room.id} for table ${tableId}`);
+      console.log(`Joined Colyseus room: ${room.id} for stake $${stakeToJoin}`);
 
-        // Colyseus rooms handle state sync automatically.
-        // We'll listen for 'table_assigned' or 'spectator_mode_active' messages from the room.
-        room.onMessage('table_assigned', (data) => {
-          console.log('Colyseus: Table assigned:', data);
-          setQueueStatus({});
-          setAssignedTableId(data.tableId);
-          setShowTableAssignedNotification(true);
-          setTimeout(() => {
-            setShowTableAssignedNotification(false);
-            navigate(`/table/${data.tableId}`);
-          }, 2000);
-        });
+      // Colyseus rooms handle state sync automatically.
+      // We'll listen for 'table_assigned' or 'spectator_mode_active' messages from the room.
+      room.onMessage('table_assigned', (data) => {
+        console.log('Colyseus: Table assigned:', data);
+        setQueueStatus({});
+        setAssignedTableId(data.tableId);
+        setShowTableAssignedNotification(true);
+        setTimeout(() => {
+          setShowTableAssignedNotification(false);
+          navigate(`/table/${data.tableId}`);
+        }, 2000);
+      });
 
-        room.onMessage('spectator_mode_active', (data) => {
-          console.log('Colyseus: Spectator mode activated (lobby):', data);
-          setQueueStatus({});
-          if (data.tableId) {
-            navigate(`/table/${data.tableId}`);
+      room.onMessage('spectator_mode_active', (data) => {
+        console.log('Colyseus: Spectator mode activated (lobby):', data);
+        setQueueStatus({});
+        if (data.tableId) {
+          navigate(`/table/${data.tableId}`);
+        }
+      });
+
+      room.onMessage('queue_status', (data) => {
+        console.log('Colyseus: queue_status received:', data);
+        setQueueStatus(prev => ({
+          ...prev,
+          [data.stake]: {
+            position: data.position,
+            queueSize: data.queueSize,
+            estimatedWait: data.estimatedWait || 0
           }
-        });
+        }));
+      });
 
-        room.onMessage('queue_status', (data) => {
-          setQueueStatus(prev => ({
-            ...prev,
-            [data.stake]: {
-              position: data.position,
-              queueSize: data.queueSize,
-              estimatedWait: data.estimatedWait || 0
-            }
-          }));
-        });
-
-        room.onError((code, message) => {
-          console.error('Colyseus room error:', code, message);
-          alert(`Game room error: ${message} (Code: ${code})`);
-          setIsJoiningQueue(false);
-        });
-
-        room.onLeave((code) => {
-          console.log('Colyseus room left:', code);
-          // Handle leaving the room, e.g., clear queue status
-          setQueueStatus({});
-          setIsJoiningQueue(false);
-        });
-
-      } catch (e) {
-        console.error('Colyseus joinOrCreate failed:', e);
-        alert(`Failed to join game: ${e.message}`);
+      room.onError((code, message) => {
+        console.error('Colyseus room error:', code, message);
+        alert(`Game room error: ${message} (Code: ${code})`);
         setIsJoiningQueue(false);
-      }
+      });
 
-      console.log(`Joining queue for stake: $${stakeToJoin}, tableId: ${tableId}`);
-    } catch (error) {
-      console.error('Error joining queue:', error);
+      room.onLeave((code) => {
+        console.log('Colyseus room left:', code);
+        // Handle leaving the room, e.g., clear queue status
+        setQueueStatus({});
+        setIsJoiningQueue(false);
+      });
+
+    } catch (e) {
+      console.error('Colyseus joinOrCreate failed:', e);
+      alert(`Failed to join game: ${e.message}`);
     } finally {
+      console.log('joinQueue finally block: setIsJoiningQueue set to false');
       setIsJoiningQueue(false);
     }
-  }, [user, isJoiningQueue]);
+  }, [user, isJoiningQueue, colyseusClient, navigate]);
 
   const leaveQueue = useCallback(async (stakeToLeave) => {
     if (!user || !roomRef.current) return;
@@ -280,7 +278,8 @@ const Lobby = () => {
 
       <div className="tables-grid">
         {filteredTables.map(table => {
-          const inQueueForThisTable = queueStatus[table.stake] && queueStatus[table.stake].tableId === table._id;
+          // The queue status is now per stake, not per table ID
+          const inQueueForThisStake = queueStatus[table.stake] && queueStatus[table.stake].position > 0;
           const isAtTable = table.players.some(p => p.username === user?.username);
           const isFull = table.players.length >= 4;
           const isPlaying = table.status === 'in_progress';
@@ -323,25 +322,25 @@ const Lobby = () => {
               <div className="table-actions">
                 <span className="table-name">{table.name}</span>
                 
-                {!isAtTable && !inQueueForThisTable && !isFull && (
+                {!isAtTable && !inQueueForThisStake && !isFull && (
                   <button
                     className={`join-button ${!hasEnoughChips ? 'disabled' : ''}`}
-                    onClick={() => joinQueue(table.stake, table._id)}
+                    onClick={() => joinQueue(table.stake)} // Removed tableId as it's now stake-based
                     disabled={isJoiningQueue || !hasEnoughChips || isFull}
                   >
-                    {isJoiningQueue ? 'Joining...' : `Join Queue ($${table.stake})`}
+                    {isJoiningQueue ? 'Joining...' : `Join Table ($${table.stake})`}
                   </button>
                 )}
 
-                {!hasEnoughChips && !isAtTable && !inQueueForThisTable && (
+                {!hasEnoughChips && !isAtTable && !inQueueForThisStake && (
                   <div className="insufficient-chips text-red-400 text-sm mt-2">
                     Need ${table.stake - (user?.chips || 0)} more chips. <Link to="/userprofile" className="text-primary hover:underline">Visit your profile to buy more.</Link>
                   </div>
                 )}
 
-                {inQueueForThisTable && (
+                {inQueueForThisStake && (
                   <div className="queue-info bg-blue-800 text-lightText p-2 rounded-md mt-2">
-                    <p className="font-semibold">In Queue:</p>
+                    <p className="font-semibold">In Queue for ${table.stake} tables:</p>
                     <p>Position: {queueStatus[table.stake].position}/{queueStatus[table.stake].queueSize}</p>
                     {queueStatus[table.stake].estimatedWait > 0 && (
                       <p>Est. wait: {queueStatus[table.stake].estimatedWait}s</p>
