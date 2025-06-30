@@ -137,9 +137,7 @@ const Lobby = () => {
     } catch (e) {
       console.error('Colyseus joinOrCreate failed:', e);
       alert(`Failed to join game: ${e.message}`);
-    } finally {
-      console.log('joinQueue finally block: setIsJoiningQueue set to false');
-      setIsJoiningQueue(false);
+      setIsJoiningQueue(false); // Set to false on error
     }
   }, [user, isJoiningQueue, colyseusClient, navigate]);
 
