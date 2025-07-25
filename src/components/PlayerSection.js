@@ -4,202 +4,273 @@ import PlayerInfo from './PlayerInfo';
 import PlayerHand from './PlayerHand';
 import PlayerSpreads from './PlayerSpreads';
 import PlayerActions from './PlayerActions';
-import { isValidSpread, calculatePoints } from '../utils/gameUtils';
-
+import { isValidSpread, calculatePoints, findBestSpread, isValidHit } from '../utils/gameUtils';
 const MemoizedPlayerInfo = memo(PlayerInfo);
 const MemoizedPlayerHand = memo(PlayerHand);
 const MemoizedPlayerSpreads = memo(PlayerSpreads);
 const MemoizedPlayerActions = memo(PlayerActions);
 
 const PlayerSection = ({
-  position,
-  className,
-  player,
-  hand,
-  spreads,
-  isCurrentTurn,
-  hasDrawnCard,
-  isHidden,
-  onDrop,
-  hitMode,
-  selectedCard,
-  onCardSelect,
-  onHit,
-  onToggleHitMode,
-  onSpread,
-  canHit,
-  canDrop,
-  gameState,
-  setGameState,
-  onActionComplete,
-  onCardClick,
-  playerIndex,
-  isCurrentPlayer,
-  isSpectator,
-  showActions,
-  validHitSpreads
-}) => {
-  const [error, setError] = useState(null);
+    position,
+    className,
+    player,
+    hand,
+    spreads,
+    isCurrentTurn,
+    hasDrawnCard,
+    isHidden,
+    onDrop,
+    hitMode,
+    selectedCard,
+    onCardSelect,
+    onHit,
+    onToggleHitMode,
+    onSpread,
+    canHit,
+    canDrop,
+    isProcessing,
+    isLoading,
+    gameState,
+    isActive,
+    setGameState,
+    onActionComplete,
+    onCardClick,
+    playerIndex, // ✅ NEW: Accept playerIndex prop
+    isCurrentPlayer, // NEW: Indicates if this is the current user
+    totalPlayers, // NEW: Total number of players in game
+    isSpectator, // ✅ NEW: Accept isSpectator prop
+    showActions = false // NEW: Only show action buttons for bottom player
+  }) => {
+    const [selectedCards, setSelectedCards] = useState([]);
+    const [selectedSpread, setSelectedSpread] = useState(null);
+    const [error, setError] = useState(null);
 
-  const safeHand = Array.isArray(hand) ? hand : [];
-  const safeSpreads = Array.isArray(spreads) ? spreads : [];
 
-  const penalties = gameState?.penalties || {};
 
-  const canDropBasedOnPoints = !isSpectator && calculatePoints(safeHand) <= 30 && !hasDrawnCard && isCurrentTurn;
+    // Ensure gameState penalties exists
+    const penalties = useMemo(() => {
+        return gameState?.penalties || {};
+    }, [gameState]);
 
-  const handleDropAction = () => {
-    if (!isSpectator && canDropBasedOnPoints) {
-      onDrop();
-      onActionComplete?.('DROP');
-    }
-  };
+    // Safeguard against missing hand data
+    const safeHand = useMemo(() => {
+        if (!hand || !Array.isArray(hand)) {
+            console.warn('Invalid hand data in PlayerSection:', hand);
+            return [];
+        }
+        return hand;
+    }, [hand]);
 
-  const handleSpread = (cards) => {
-    if (!isSpectator && isValidSpread(cards)) {
-      onSpread(cards);
-    }
-  };
+    // Safeguard against missing spreads data
+    const safeSpreads = useMemo(() => {
+        if (!spreads || !Array.isArray(spreads)) {
+            console.warn('Invalid spreads data in PlayerSection:', spreads);
+            return [];
+        }
+        return spreads;
+    }, [spreads]);
 
-  const handleHit = (cardIndex, targetIndex, spreadIndex) => {
-    if (!isSpectator) onHit(cardIndex, targetIndex, spreadIndex);
-  };
+    const canDropBasedOnPoints = useMemo(() => {
+        // ✅ Add isSpectator check
+        return !isSpectator && calculatePoints(safeHand) <= 30 && !hasDrawnCard && isCurrentTurn;
+    }, [safeHand, hasDrawnCard, isCurrentTurn, isSpectator]); // ✅ Add isSpectator dependency
 
-  const handleCardClick = (cardIndex) => {
-    if (!isSpectator) onCardClick(cardIndex);
-  };
+    const handleSpread = (cards) => {
+        // ✅ Prevent spectators from spreading
+        if (isSpectator) return;
+        try {
+            if (isValidSpread(cards)) {
+                onSpread(cards);
+            }
+        } catch (err) {
+            console.error('Error handling spread:', err);
+            setError('Failed to create spread');
+        }
+    };
 
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => setError(null), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [error]);
+    const handleHit = (cardIndex, targetIndex, spreadIndex) => {
+        // ✅ Prevent spectators from spreading
+        if (isSpectator) return;
+        try {
+            if (isCurrentTurn && hasDrawnCard) {
+                onHit(cardIndex, targetIndex, spreadIndex);
+            }
+        } catch (err) {
+            console.error('Error handling hit:', err);
+            setError('Failed to hit target');
+        }
+    };
 
-  /** Opponent simplified rendering (avatars + card backs) */
-  if (!isCurrentPlayer) {
+    const handleDropAction = () => {
+        // ✅ Prevent spectators from spreading
+        if (isSpectator) return;
+        try {
+            if (canDropBasedOnPoints) {
+                onDrop();
+                onActionComplete?.('DROP');
+            }
+        } catch (err) {
+            console.error('Error handling drop:', err);
+            setError('Failed to drop');
+        }
+    };
+
+    const handleCardClick = (cardIndex) => {
+        // ✅ Prevent spectators from spreading
+        if (isSpectator) return;
+        try {
+            if (isCurrentTurn && hasDrawnCard) {
+                onCardClick(cardIndex);
+            }
+        } catch (err) {
+            console.error('Error handling card click:', err);
+        }
+    };
+
+
+
+    // Clear error after 5 seconds
+    useEffect(() => {
+        if (error) {
+            const timer = setTimeout(() => setError(null), 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
+
+
+
+
+
     return (
-      <div className={`flex flex-col items-center justify-center p-2 rounded-md bg-black/40 text-white ${className || ''}`}>
-        <MemoizedPlayerInfo player={player} isActive={isCurrentTurn} />
-        {/* Opponent hand shows only backs */}
-        <div className="flex gap-1 mt-1">
-          {safeHand.map((_, i) => (
-            <div key={i} className="card bg-gray-500 rounded-sm w-6 h-9 shadow-md" />
-          ))}
+        <div
+            className={`flex flex-col items-center justify-center p-sm rounded-md bg-darkBackground/90 shadow-sm border-1.5 border-transparent z-10 transition-all duration-300 relative
+            ${isCurrentTurn ? 'border-accentGold shadow-lg animate-activePulse' : ''}
+            ${penalties[position] > 0 ? 'opacity-70' : ''}
+            ${className || ''}`}
+        >
+            {error && <div className="text-error text-sm font-bold mb-sm">{error}</div>}
+
+            {isCurrentTurn && (
+                <div className="absolute top-0 right-0 -mt-2 -mr-2 bg-accentGold text-darkText text-xs font-bold px-2 py-1 rounded-full z-20 shadow-md">
+                    Current Turn
+                </div>
+            )}
+            <div className="flex flex-col items-center w-full p-2 rounded-lg shadow-md bg-gray-800/70 border border-gray-700">
+                <MemoizedPlayerInfo
+                    player={player}
+                    isActive={isCurrentTurn}
+                    className="mb-sm"
+                    handScore={isCurrentPlayer ? calculatePoints(safeHand) : null}
+                />
+
+                <MemoizedPlayerHand
+                    key={`hand-${safeHand.length}-${isCurrentTurn}-${gameState?.updateId || 'initial'}`}
+                    cards={safeHand}
+                    isActive={isCurrentTurn && !isSpectator}
+                    onCardClick={handleCardClick}
+                    isHidden={isHidden}
+                    hitMode={hitMode}
+                    onToggleHitMode={onToggleHitMode}
+                    selectedCard={selectedCard}
+                    onCardSelect={onCardSelect}
+                    className="w-full"
+                    playerIndex={playerIndex}
+                />
+            </div>
+
+            <div className="flex flex-col items-center w-full mt-sm p-2 rounded-lg shadow-md bg-gray-800/70 border border-gray-700">
+                <MemoizedPlayerSpreads
+                    key={`spreads-${position}-${gameState?.updateId || 'initial'}`}
+                    spreads={safeSpreads}
+                    onSpreadClick={handleHit}
+                    isHitModeActive={hitMode}
+                    selectedCard={selectedCard}
+                    isCurrentPlayer={isCurrentPlayer}
+                    isSpectator={isSpectator}
+                    position={position}
+                    className="w-full"
+                    playerIndex={playerIndex}
+                />
+
+                {showActions && isCurrentTurn && !isHidden && !isSpectator && (
+                    <MemoizedPlayerActions
+                        isActive={isCurrentTurn}
+                        canSpread={isValidSpread}
+                        canHit={canHit}
+                        hasDrawnCard={hasDrawnCard}
+                        onSpread={handleSpread}
+                        onHit={handleHit}
+                        onToggleHitMode={onToggleHitMode}
+                        isHitModeActive={hitMode}
+                        onDrop={handleDropAction}
+                        canDrop={canDropBasedOnPoints}
+                        gameState={gameState || {}}
+                        setGameState={setGameState}
+                        onActionComplete={onActionComplete}
+                        className="mt-md flex flex-wrap justify-center gap-sm"
+                    />
+                )}
+            </div>
+
+            {penalties[position] > 0 && (
+                <div className="text-error text-sm font-bold mt-sm">
+                    Penalized: {penalties[position]} turns
+                </div>
+            )}
         </div>
-        {penalties[position] > 0 && (
-          <div className="text-red-400 text-xs mt-1">Penalized: {penalties[position]}</div>
-        )}
-      </div>
-    );
-  }
-
-  /** Current player (full controls) */
-  return (
-    <div
-      className={`flex flex-col items-center justify-center p-2 rounded-md bg-darkBackground/90 shadow-md border border-transparent relative ${isCurrentTurn ? 'border-yellow-400 shadow-lg' : ''} ${className || ''}`}
-    >
-      {error && <div className="text-red-500 text-sm font-bold mb-1">{error}</div>}
-
-      <MemoizedPlayerInfo player={player} isActive={isCurrentTurn} handScore={calculatePoints(safeHand)} />
-
-    <MemoizedPlayerHand
-  cards={safeHand}
-  isActive={isCurrentTurn && !isSpectator}
-  onCardClick={(index) => {
-    if (isCurrentTurn && !isSpectator) {
-      onCardClick(index);  // <-- This sends the index up to Gameboard.js
-    }
-  }}
-  isHidden={false}
-  hitMode={hitMode}
-  onToggleHitMode={onToggleHitMode}
-  selectedCard={selectedCard}
-  onCardSelect={onCardSelect}
-  className="w-full mt-1"
-  playerIndex={playerIndex}
-/>
+      );
+    };
 
 
-      <MemoizedPlayerSpreads
-        spreads={safeSpreads}
-        onSpreadClick={handleHit}
-        isHitModeActive={hitMode}
-        selectedCard={selectedCard}
-        isCurrentPlayer={isCurrentPlayer}
-        isSpectator={isSpectator}
-        position={position}
-        playerIndex={playerIndex}
-        validHitSpreads={validHitSpreads[playerIndex] || []}
-        className="w-full mt-2"
-      />
-
-      {showActions && isCurrentTurn && !isSpectator && (
-  <MemoizedPlayerActions
-    isActive={isCurrentTurn}
-    canHit={canHit}
-    onHit={onHit}
-    onToggleHitMode={onToggleHitMode}
-    isHitModeActive={hitMode}
-    onSpread={handleSpread}
-    onDrop={handleDropAction}
-    canDrop={canDropBasedOnPoints}
-    gameState={gameState || {}}
-    setGameState={setGameState}
-    onActionComplete={onActionComplete}
-    className="mt-2 flex gap-2 justify-center"
-  />
-)}
-
-
-      {penalties[position] > 0 && (
-        <div className="text-red-400 text-xs mt-1">Penalized: {penalties[position]}</div>
-      )}
-    </div>
-  );
-};
-
+// Update PropTypes
 PlayerSection.propTypes = {
-  position: PropTypes.string.isRequired,
-  player: PropTypes.object,
-  hand: PropTypes.array,
-  spreads: PropTypes.array,
-  isCurrentTurn: PropTypes.bool,
-  hasDrawnCard: PropTypes.bool,
-  isHidden: PropTypes.bool,
-  onDrop: PropTypes.func,
-  hitMode: PropTypes.bool,
-  selectedCard: PropTypes.number,
-  onCardSelect: PropTypes.func,
-  onHit: PropTypes.func,
-  onToggleHitMode: PropTypes.func,
-  onSpread: PropTypes.func,
-  canHit: PropTypes.bool,
-  canDrop: PropTypes.bool,
-  gameState: PropTypes.object,
-  setGameState: PropTypes.func,
-  onActionComplete: PropTypes.func,
-  onCardClick: PropTypes.func,
-  className: PropTypes.string,
-  playerIndex: PropTypes.number,
-  isCurrentPlayer: PropTypes.bool,
-  isSpectator: PropTypes.bool,
-  showActions: PropTypes.bool,
-  validHitSpreads: PropTypes.array
+    position: PropTypes.string.isRequired,
+    player: PropTypes.object,
+    hand: PropTypes.array,
+    canSpread: PropTypes.bool,
+    spreads: PropTypes.array,
+    isCurrentTurn: PropTypes.bool,
+    isHidden: PropTypes.bool,
+    hasDrawnCard: PropTypes.bool,
+    onDrop: PropTypes.func,
+    hitMode: PropTypes.bool,
+    selectedCard: PropTypes.number,
+    onCardSelect: PropTypes.func,
+    onHit: PropTypes.func,
+    onToggleHitMode: PropTypes.func,
+    onSpread: PropTypes.func,
+    canHit: PropTypes.bool,
+    canDrop: PropTypes.bool,
+    isProcessing: PropTypes.bool,
+    isActive: PropTypes.bool,
+    onCardClick: PropTypes.func,
+    gameState: PropTypes.object,
+    setGameState: PropTypes.func,
+    onActionComplete: PropTypes.func,
+    className: PropTypes.string,
+    playerIndex: PropTypes.number, // Add prop type for playerIndex
+    isCurrentPlayer: PropTypes.bool, // Add prop type for isCurrentPlayer
+    totalPlayers: PropTypes.number, // Add prop type for totalPlayers
+    isSpectator: PropTypes.bool,
+    showActions: PropTypes.bool // Only show action buttons for bottom player
 };
 
+// Provide default props
 PlayerSection.defaultProps = {
-  hand: [],
-  spreads: [],
-  isCurrentTurn: false,
-  hasDrawnCard: false,
-  isHidden: false,
-  hitMode: false,
-  canHit: false,
-  canDrop: false,
-  isSpectator: false,
-  showActions: false,
-  validHitSpreads: []
+    hand: [],
+    spreads: [],
+    isCurrentTurn: false,
+    isHidden: false,
+    hasDrawnCard: false,
+    hitMode: false,
+    canHit: false,
+    canDrop: false,
+    isProcessing: false,
+    isActive: false,
+    gameState: { penalties: {} },
+    playerIndex: -1, // Default value
+    isCurrentPlayer: false, // Default value
+    totalPlayers: 0, // Default value
+    isSpectator: false,
+    showActions: false
 };
-
-export default memo(PlayerSection);
