@@ -6,11 +6,11 @@
     --accent-red: #FF1744; /* Neon red */
     --accent-gold: #FFD600; /* Gold */
     --dark-background: #181A20; /* Deep dark */
-    --felt-background: #232946; /* Table felt */
+    --felt-background: #2E8B57; /* Seagreen, similar to the image */
     --light-text: #F5F7FA;
     --dark-text: #232946;
-    --table-felt-color: #232946;
-    --table-border-color: #FFD600;
+    --table-felt-color: #2E8B57;
+    --table-border-color: #8B4513; /* SaddleBrown, for the wood border */
     --card-background: #FFF;
     --border-color: #2C3E50;
     --shadow-light: rgba(0, 0, 0, 0.08);
@@ -70,11 +70,14 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: var(--gradient-table);
+    background: var(--table-felt-color);
     color: var(--light-text);
     transition: padding-top 0.3s ease;
     position: relative;
-    padding-bottom: 0;
+    padding: 20px;
+    border: 20px solid var(--table-border-color);
+    border-radius: 150px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
 }
 
 .table-header {
