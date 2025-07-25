@@ -40,7 +40,6 @@ const PlayerSection = ({
     totalPlayers, // NEW: Total number of players in game
     isSpectator, // ✅ NEW: Accept isSpectator prop
     showActions = false, // NEW: Only show action buttons for bottom player
-    showActions = false, // NEW: Only show action buttons for bottom player
     validHitSpreads = [] // NEW: Array of booleans indicating valid hit targets for each spread
   }) => {
     const [selectedCards, setSelectedCards] = useState([]);
