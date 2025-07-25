@@ -27,63 +27,55 @@ body {
 }
 
 .game-board {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 1200px; /* Or any desired max-width */
+  margin: auto;
 }
 
-/* === LANDSCAPE MOBILE OPTIMIZED === */
-@media (max-width: 900px) and (orientation: landscape) {
-  .mobile-game-layout {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    width: 100vw;
-    height: 100vh;
-    padding: 5px;
-    box-sizing: border-box;
-    gap: 8px;
-  }
+.player-section {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 150px; /* Adjust as needed */
+}
 
-  .center-game-area-mobile-landscape {
-    flex: 0 0 auto;
-    width: 180px;
-    height: 180px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 3px solid var(--gold);
-    border-radius: 50%;
-    background: #175e3a;
-    z-index: 1;
-  }
+.player-section-top {
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
 
-  .player-section-current {
-    position: absolute;
-    bottom: 10px;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    overflow-x: auto;
-    padding: 5px;
-    background: rgba(0, 0, 0, 0.7);
-    border-top: 2px solid var(--gold);
-    z-index: 5;
-  }
+.player-section-bottom {
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
 
-  .player-section-opponent {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 80px;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 8px;
-  }
+.player-section-left {
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+}
+
+.player-section-right {
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+}
+
+.center-game-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
 }
 
 /* === ACTION BAR === */
