@@ -103,18 +103,23 @@ const PlayerSection = ({
 
       <MemoizedPlayerInfo player={player} isActive={isCurrentTurn} handScore={calculatePoints(safeHand)} />
 
-      <MemoizedPlayerHand
-        cards={safeHand}
-        isActive={isCurrentTurn && !isSpectator}
-        onCardClick={handleCardClick}
-        isHidden={false}
-        hitMode={hitMode}
-        onToggleHitMode={onToggleHitMode}
-        selectedCard={selectedCard}
-        onCardSelect={onCardSelect}
-        className="w-full mt-1"
-        playerIndex={playerIndex}
-      />
+    <MemoizedPlayerHand
+  cards={safeHand}
+  isActive={isCurrentTurn && !isSpectator}
+  onCardClick={(index) => {
+    if (isCurrentTurn && !isSpectator) {
+      onCardClick(index);  // <-- This sends the index up to Gameboard.js
+    }
+  }}
+  isHidden={false}
+  hitMode={hitMode}
+  onToggleHitMode={onToggleHitMode}
+  selectedCard={selectedCard}
+  onCardSelect={onCardSelect}
+  className="w-full mt-1"
+  playerIndex={playerIndex}
+/>
+
 
       <MemoizedPlayerSpreads
         spreads={safeSpreads}
