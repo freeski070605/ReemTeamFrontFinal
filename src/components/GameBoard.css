@@ -13,65 +13,57 @@
   box-sizing: border-box;
 }
 
-/* Mobile landscape layout */
-@media (max-width: 768px) and (orientation: landscape) {
+/* Landscape mode redesign */
+@media (max-width: 900px) and (orientation: landscape) {
   .mobile-game-layout {
-    display: grid;
-    grid-template-columns: 1fr 3fr 1fr; /* Left, Center, Right - give more space to center */
-    grid-template-rows: auto 1fr auto; /* Top, Middle, Bottom */
-    gap: 10px; /* Increase gap for better spacing */
-    height: 100vh; /* Use full viewport height */
-    width: 100vw; /* Use full viewport width */
-    overflow: auto; /* Enable scrolling for game board content */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
     padding: 5px;
     box-sizing: border-box;
-    max-width: none; /* Remove max-width in landscape */
-  }
-}
-
-  .player-section-current {
-    grid-column: 2 / 3;
-    grid-row: 3 / 4;
-    align-self: end;
-    justify-self: center;
-    width: 100%; /* Allow to take full width of its grid cell */
-    max-width: 400px; /* Increase max-width for current player section */
+    gap: 8px;
+    background: var(--table-felt, #2e8b57);
   }
 
   .center-game-area-mobile-landscape {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
-    align-self: center;
-    justify-self: center;
-    width: 100%;
-    height: 100%;
-    max-width: 350px; /* Increase max-width for center game area */
-    max-height: 350px; /* Increase max-height for center game area */
+    flex: 0 0 auto;
+    width: 180px;
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 3px solid gold;
+    border-radius: 50%;
+    background: #175e3a;
   }
 
-  .player-section-top-mobile-landscape {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
-    align-self: start;
-    justify-self: center;
-    width: 100%;
-    max-width: 250px; /* Increase max-width for top player section */
+  .player-section-current {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    overflow-x: auto;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.6);
+    border-top: 2px solid gold;
   }
 
-  .player-section-left-mobile-landscape {
-    grid-column: 1 / 2;
-    grid-row: 2 / 3;
-    align-self: center;
-    justify-self: start;
-    width: 100%;
-    max-width: 250px; /* Increase max-width for left player section */
-  }
-
+  .player-section-top-mobile-landscape,
+  .player-section-left-mobile-landscape,
   .player-section-right-mobile-landscape {
-    grid-column: 3 / 4;
-    grid-row: 2 / 3;
-    align-self: center;
-    justify-self: end;
-    width: 100%;
-    max-width: 250px; /* Increase max-width for right player section */
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 80px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+  }
 }
+
