@@ -70,18 +70,39 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
   }, [socket, tableId, isSpectator]);
 
   const handleCardClick = useCallback((cardIndex) => {
-    if (adjustedCurrentTurn !== 0 || isSpectator) return;
-    if (hitMode) {
-      setSelectedCard(cardIndex);
-      return;
-    }
-    if (gameState.hasDrawnCard) {
-      socket.emit('game_action', { tableId, action: 'DISCARD', payload: { cardIndex } });
-    } else {
-      setActionBlockedMessage('You must draw a card first.');
-      setTimeout(() => setActionBlockedMessage(''), 2000);
-    }
-  }, [adjustedCurrentTurn, isSpectator, hitMode, gameState.hasDrawnCard, socket, tableId]);
+  if (adjustedCurrentTurn !== 0 || isSpectator) {
+    setActionBlockedMessage("It's not your turn.");
+    setTimeout(() => setActionBlockedMessage(''), 1500);
+    return;
+  }
+
+  // If in hit mode, just select the card for a hit
+  if (hitMode) {
+    setSelectedCard(cardIndex);
+    return;
+  }
+
+  // If already drew a card, allow discard by clicking hand
+  if (gameState.hasDrawnCard) {
+    socket.emit('game_action', {
+      tableId,
+      action: 'DISCARD',
+      payload: { cardIndex }
+    });
+  } else {
+    // Must draw first
+    setActionBlockedMessage("You must draw a card first.");
+    setTimeout(() => setActionBlockedMessage(''), 1500);
+  }
+}, [
+  adjustedCurrentTurn,
+  isSpectator,
+  hitMode,
+  gameState.hasDrawnCard,
+  socket,
+  tableId
+]);
+
 
   useEffect(() => {
     const ready = Array.isArray(gameState?.playerHands) && Array.isArray(gameState?.deck) && gameState.players.length > 0 && gameState.isInitialized;
