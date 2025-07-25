@@ -5,7 +5,7 @@ import PlayerHand from './PlayerHand';
 import PlayerSpreads from './PlayerSpreads';
 import PlayerActions from './PlayerActions';
 import { isValidSpread, calculatePoints, findBestSpread, isValidHit } from '../utils/gameUtils';
-const MemoizedPlayerInfo = memo(PlayerInfo);
+
 const MemoizedPlayerHand = memo(PlayerHand);
 const MemoizedPlayerSpreads = memo(PlayerSpreads);
 const MemoizedPlayerActions = memo(PlayerActions);
@@ -156,12 +156,12 @@ const PlayerSection = ({
                     Current Turn
                 </div>
             )}
-            <div className="flex flex-col items-center w-full p-2 rounded-lg shadow-md bg-gray-800/70 border border-gray-700">
-                <MemoizedPlayerInfo
+            <div className="flex flex-col items-center w-full">
+                <PlayerInfo
                     player={player}
                     isActive={isCurrentTurn}
-                    className="mb-sm"
                     handScore={isCurrentPlayer ? calculatePoints(safeHand) : null}
+                    isCurrentPlayer={isCurrentPlayer}
                 />
 
                 <MemoizedPlayerHand
