@@ -5,7 +5,7 @@ import PlayerHand from './PlayerHand';
 import PlayerSpreads from './PlayerSpreads';
 import PlayerActions from './PlayerActions';
 import { isValidSpread, calculatePoints, findBestSpread, isValidHit } from '../utils/gameUtils';
-
+import './PlayerSection.css';
 const MemoizedPlayerHand = memo(PlayerHand);
 const MemoizedPlayerSpreads = memo(PlayerSpreads);
 const MemoizedPlayerActions = memo(PlayerActions);
