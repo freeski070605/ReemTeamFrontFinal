@@ -1,2 +1,7 @@
-/* PlayerSection.css - All styles moved to Tailwind classes in PlayerSection.js */
-/* This file can now be safely removed or left empty. */
+.player-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* Space between PlayerInfo and PlayerSpreads */
+}
