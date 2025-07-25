@@ -39,7 +39,7 @@ const PlayerSection = ({
     isCurrentPlayer, // NEW: Indicates if this is the current user
     totalPlayers, // NEW: Total number of players in game
     isSpectator, // ✅ NEW: Accept isSpectator prop
-    showActions = false // NEW: Only show action buttons for bottom player
+    showActions = false, // NEW: Only show action buttons for bottom player
     showActions = false, // NEW: Only show action buttons for bottom player
     validHitSpreads = [] // NEW: Array of booleans indicating valid hit targets for each spread
   }) => {
