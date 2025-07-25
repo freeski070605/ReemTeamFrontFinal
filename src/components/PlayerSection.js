@@ -130,23 +130,22 @@ const PlayerSection = ({
       />
 
       {showActions && isCurrentTurn && !isSpectator && (
-        <MemoizedPlayerActions
-          isActive={isCurrentTurn}
-          canSpread={isValidSpread}
-          canHit={canHit}
-          hasDrawnCard={hasDrawnCard}
-          onSpread={handleSpread}
-          onHit={handleHit}
-          onToggleHitMode={onToggleHitMode}
-          isHitModeActive={hitMode}
-          onDrop={handleDropAction}
-          canDrop={canDropBasedOnPoints}
-          gameState={gameState || {}}
-          setGameState={setGameState}
-          onActionComplete={onActionComplete}
-          className="mt-2 flex gap-2 justify-center"
-        />
-      )}
+  <MemoizedPlayerActions
+    isActive={isCurrentTurn}
+    canHit={canHit}
+    onHit={onHit}
+    onToggleHitMode={onToggleHitMode}
+    isHitModeActive={hitMode}
+    onSpread={handleSpread}
+    onDrop={handleDropAction}
+    canDrop={canDropBasedOnPoints}
+    gameState={gameState || {}}
+    setGameState={setGameState}
+    onActionComplete={onActionComplete}
+    className="mt-2 flex gap-2 justify-center"
+  />
+)}
+
 
       {penalties[position] > 0 && (
         <div className="text-red-400 text-xs mt-1">Penalized: {penalties[position]}</div>
