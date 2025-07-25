@@ -588,7 +588,7 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
   </GameErrorBoundary>
 );
 
-};
+
 
 GameBoard.propTypes = {
     tableId: PropTypes.string.isRequired,
