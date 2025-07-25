@@ -275,7 +275,6 @@ PlayerSection.defaultProps = {
     isCurrentPlayer: false, // Default value
     totalPlayers: 0, // Default value
     isSpectator: false,
-    showActions: false
     showActions: false,
     validHitSpreads: []
 };
