@@ -69,28 +69,30 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
     if (!isSpectator) socket.emit('game_action', { tableId, action: 'DROP' });
   }, [socket, tableId, isSpectator]);
 
-  const handleCardClick = useCallback((cardIndex) => {
+ const handleCardClick = useCallback((cardIndex) => {
+  // Only current player, only during their turn
   if (adjustedCurrentTurn !== 0 || isSpectator) {
     setActionBlockedMessage("It's not your turn.");
     setTimeout(() => setActionBlockedMessage(''), 1500);
     return;
   }
 
-  // If in hit mode, just select the card for a hit
+  // If hit mode, just select the card to hit with
   if (hitMode) {
     setSelectedCard(cardIndex);
     return;
   }
 
-  // If already drew a card, allow discard by clicking hand
+  // If already drew a card, discard by emitting to server
   if (gameState.hasDrawnCard) {
+    console.log("Discarding card:", reorderedHands[0][cardIndex]);
     socket.emit('game_action', {
       tableId,
       action: 'DISCARD',
       payload: { cardIndex }
     });
   } else {
-    // Must draw first
+    // Must draw first before discarding
     setActionBlockedMessage("You must draw a card first.");
     setTimeout(() => setActionBlockedMessage(''), 1500);
   }
@@ -99,9 +101,11 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
   isSpectator,
   hitMode,
   gameState.hasDrawnCard,
+  reorderedHands,
   socket,
   tableId
 ]);
+
 
 
   useEffect(() => {
