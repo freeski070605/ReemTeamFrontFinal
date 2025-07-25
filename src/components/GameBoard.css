@@ -1,19 +1,17 @@
-/* ReemTeamFrontFinal/src/components/GameBoard.css */
 
-/* Default mobile layout (portrait) */
 .mobile-game-layout {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   width: 100%;
-  max-width: 400px; /* Max width for portrait */
+  max-width: 400px;
   margin: 0 auto;
   padding: 10px;
   box-sizing: border-box;
+  background: #175e3a;
 }
 
-/* Landscape mode redesign */
 @media (max-width: 900px) and (orientation: landscape) {
   .mobile-game-layout {
     display: flex;
@@ -67,3 +65,28 @@
   }
 }
 
+.action-bar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.85);
+  border-top: 2px solid gold;
+  padding: 8px;
+  z-index: 50;
+}
+
+.action-btn {
+  background: gold;
+  color: black;
+  font-weight: bold;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  min-width: 80px;
+  transition: all 0.2s ease-in-out;
+}
+
+.action-btn:hover {
+  background: #ffcc33;
+  transform: scale(1.05);
