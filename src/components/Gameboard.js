@@ -492,210 +492,70 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
                     </div>
                 )}
 
-                <div className={`game-board flex-grow relative w-full max-w-screen-xl mx-auto p-lg box-border overflow-visible
-                                sm:grid sm:grid-cols-3 sm:grid-rows-[auto_3fr_auto] sm:gap-md sm:max-w-4xl sm:h-[calc(100vh-120px)] sm:rounded-lg sm:bg-tableFelt sm:shadow-medium
-                                lg:block lg:max-w-6xl lg:min-h-[600px] lg:h-[calc(100vh-120px)] lg:rounded-xl lg:bg-tableFelt lg:shadow-medium`}>
+                <div className="game-board">
+                    {/* Player Sections */}
+                    {reorderedPlayers.map((player, index) => {
+                        const position = positions[index];
+                        const isCurrentPlayer = index === 0;
+                        const isCurrentTurn = adjustedCurrentTurn === index;
+                        const showActions = isCurrentPlayer && !isSpectator;
+                        const cardToHitWith = reorderedHands[0]?.[selectedCard];
 
-                   {/* Mobile Layout */}
-                   <div className="lg:hidden mobile-game-layout">
-                       {reorderedPlayers.map((player, index) => {
-                           const isCurrentPlayer = index === 0; // Define isCurrentPlayer for mobile layout
-                           if (isCurrentPlayer) return null; // Current player rendered separately
+                        return (
+                            <PlayerSection
+                                key={`${player?.username || `player-${index}`}-${position}`}
+                                position={position}
+                                className={`player-section player-section-${position}`}
+                                player={player}
+                                hand={reorderedHands[index] || []}
+                                spreads={reorderedSpreads[index] || []}
+                                isCurrentTurn={isCurrentTurn}
+                                hasDrawnCard={gameState.hasDrawnCard}
+                                isHidden={!isCurrentPlayer}
+                                onDrop={handleDrop}
+                                hitMode={hitMode}
+                                selectedCard={selectedCard}
+                                onCardSelect={handleCardClick}
+                                onHit={handleHit}
+                                onToggleHitMode={toggleHitMode}
+                                onSpread={handleSpread}
+                                canHit={true}
+                                canDrop={!gameState.hasDrawnCard && isCurrentTurn && (player?.hitPenaltyRounds ?? 0) === 0}
+                                isProcessing={false}
+                                isLoading={false}
+                                gameState={gameState}
+                                isActive={hitMode}
+                                setGameState={setGameState}
+                                onActionComplete={(action) => {
+                                    if (action === 'DROP') handleDrop();
+                                }}
+                                onCardClick={handleCardClick}
+                                playerIndex={index}
+                                isCurrentPlayer={isCurrentPlayer}
+                                totalPlayers={reorderedPlayers.length}
+                                isSpectator={isSpectator}
+                                showActions={showActions}
+                                handScore={isCurrentPlayer ? currentPlayerHandScore : null}
+                                validHitSpreads={hitMode && cardToHitWith ? reorderedSpreads.map(playerSpreads =>
+                                    playerSpreads.map(spread => isValidHit(cardToHitWith, spread))
+                                ) : []}
+                            />
+                        );
+                    })}
 
-                           let mobilePlayerClass = `player w-full max-w-full min-h-[80px] mb-sm flex flex-col items-center justify-center p-sm rounded-md bg-darkBackground/90 shadow-sm border-1.5 border-transparent z-10 transition-all duration-300
-                                                   ${adjustedCurrentTurn === index ? 'border-accentGold shadow-lg' : ''}`;
-
-                           // Apply specific classes for landscape mode
-                           if (window.matchMedia("(orientation: landscape)").matches && window.innerWidth <= 768) {
-                               if (index === 1) mobilePlayerClass += ' player-section-top-mobile-landscape';
-                               else if (index === 2) mobilePlayerClass += ' player-section-left-mobile-landscape';
-                               else if (index === 3) mobilePlayerClass += ' player-section-right-mobile-landscape';
-                           }
-
-                           return (
-                               <PlayerSection
-                                   key={`${player?.username || `player-${index}`}-mobile-${gameState?.timestamp || 'initial'}`}
-                                   position="static" // Tailwind handles stacking
-                                   className={mobilePlayerClass}
-                                   player={player}
-                                   hand={reorderedHands[index] || []}
-                                   spreads={reorderedSpreads[index] || []}
-                                   isCurrentTurn={adjustedCurrentTurn === index}
-                                   hasDrawnCard={gameState.hasDrawnCard}
-                                   isHidden={!isCurrentPlayer} // Hide other players' hands
-                                   onDrop={handleDrop}
-                                   hitMode={hitMode}
-                                   selectedCard={selectedCard}
-                                   onCardSelect={handleCardClick}
-                                   onHit={handleHit}
-                                   onToggleHitMode={toggleHitMode}
-                                   onSpread={handleSpread}
-                                   canHit={true}
-                                   canDrop={!gameState.hasDrawnCard && adjustedCurrentTurn === index && player.hitPenaltyRounds === 0}
-                                   isProcessing={false}
-                                   isLoading={false}
-                                   gameState={gameState}
-                                   isActive={hitMode}
-                                   setGameState={setGameState}
-                                   onActionComplete={(action) => {
-                                       if (action === 'DROP') handleDrop();
-                                   }}
-                                   onCardClick={handleCardClick}
-                                   playerIndex={index}
-                                   isCurrentPlayer={false}
-                                   totalPlayers={reorderedPlayers.length}
-                                   isSpectator={isSpectator}
-                                   showActions={false} // Actions are separate for mobile
-                                   handScore={null} // AI/Other players don't show score
-                                   validHitSpreads={hitMode && selectedCard !== null ? reorderedSpreads.map(playerSpreads =>
-                                     playerSpreads.map(spread => isValidHit(reorderedHands[0][selectedCard], spread))
-                                   ) : []}
-                               />
-                           );
-                       })}
-
-                       <CenterGameArea
-                           className={`center-area w-11/12 h-[200px] max-w-xs mx-auto my-md rounded-md bg-tableFelt border-3 border-accentGold shadow-lg flex flex-col justify-center items-center z-5 transition-all duration-300
-                                       ${window.matchMedia("(orientation: landscape)").matches && window.innerWidth <= 768 ? 'center-game-area-mobile-landscape' : ''}`}
-                           deck={gameState?.deck || []}
-                           discardPile={gameState?.discardPile || []}
-                           currentTurn={adjustedCurrentTurn}
-                           hasDrawnCard={gameState?.hasDrawnCard || false}
-                           handlePlayerAction={handlePlayerAction}
-                           isLoading={false}
-                           players={reorderedPlayers}
-                           pot={gameState?.stake * reorderedPlayers.length || 0}
-                           isSpectator={isSpectator}
-                       />
-
-                       <PlayerSection
-                           key={`${currentPlayerObject?.username || `player-0`}-mobile-current-${gameState?.timestamp || 'initial'}`}
-                           position="static"
-                           className={`player w-full max-w-full min-h-[80px] flex flex-col items-center justify-center p-sm rounded-md bg-darkBackground/90 shadow-sm border-1.5 border-transparent z-10 transition-all duration-300 mb-8
-                                       ${adjustedCurrentTurn === 0 ? 'border-accentGold shadow-lg' : ''}
-                                       ${window.matchMedia("(orientation: landscape)").matches && window.innerWidth <= 768 ? 'player-section-current' : ''}`}
-                           player={currentPlayerObject}
-                           hand={reorderedHands[0] || []}
-                           spreads={reorderedSpreads[0] || []}
-                           isCurrentTurn={adjustedCurrentTurn === 0}
-                           hasDrawnCard={gameState.hasDrawnCard}
-                           isHidden={false} // Always show current player's hand
-                           onDrop={handleDrop}
-                           hitMode={hitMode}
-                           selectedCard={selectedCard}
-                           onCardSelect={handleCardClick}
-                           onHit={handleHit}
-                           onToggleHitMode={toggleHitMode}
-                           onSpread={handleSpread}
-                           canHit={true}
-                           canDrop={!gameState.hasDrawnCard && adjustedCurrentTurn === 0 && currentPlayerObject?.hitPenaltyRounds === 0}
-                           isProcessing={false}
-                           isLoading={false}
-                           gameState={gameState}
-                           isActive={hitMode}
-                           setGameState={setGameState}
-                           onActionComplete={(action) => {
-                               if (action === 'DROP') handleDrop();
-                           }}
-                           onCardClick={handleCardClick}
-                           playerIndex={0}
-                           isCurrentPlayer={true}
-                           totalPlayers={reorderedPlayers.length}
-                           isSpectator={isSpectator}
-                           showActions={showPlayerActions} // Show actions for the current player
-                           handScore={currentPlayerHandScore} // Show score for current player
-                           validHitSpreads={hitMode && selectedCard !== null ? reorderedSpreads.map(playerSpreads =>
-                             playerSpreads.map(spread => isValidHit(reorderedHands[0][selectedCard], spread))
-                           ) : []}
-                       />
-
-                   </div>
-
-                   {/* Tablet & Desktop Layout */}
-                   <div className="hidden lg:block w-full h-full relative">
-                       {reorderedPlayers.map((player, index) => {
-                           const position = positions[index]; // top, bottom, left, right
-                           const isCurrentPlayer = index === 0;
-                           const isCurrentTurn = adjustedCurrentTurn === index;
-                           const showActions = position === 'bottom' && isCurrentTurn && !isSpectator;
-
-                           let playerSectionClasses = `player absolute w-[420px] max-w-[32vw] min-w-[220px] min-h-[120px] flex items-center justify-center p-0 px-md rounded-lg shadow-sm border-2 border-transparent z-20 transition-all duration-300
-                                                       ${isCurrentTurn ? 'border-accentGold shadow-lg' : ''}`;
-
-                           switch (position) {
-                               case 'top':
-                                   playerSectionClasses += ' top-5 left-1/2 -translate-x-1/2';
-                                   break;
-                               case 'bottom':
-                                   playerSectionClasses += ' bottom-10 left-1/2 -translate-x-1/2';
-                                   break;
-                               case 'left':
-                                   playerSectionClasses += ' left-5 top-1/2 -translate-y-1/2';
-                                   break;
-                               case 'right':
-                                   playerSectionClasses += ' right-5 top-1/2 -translate-y-1/2';
-                                   break;
-                               default:
-                                   break;
-                           }
-
-                           return (
-                               <PlayerSection
-                                   key={`${player?.username || `player-${index}`}-${index}-${gameState?.timestamp || 'initial'}`}
-                                   position={position}
-                                   className={playerSectionClasses}
-                                   player={player}
-                                   hand={reorderedHands[index] || []}
-                                   spreads={reorderedSpreads[index] || []}
-                                   isCurrentTurn={isCurrentTurn}
-                                   hasDrawnCard={gameState.hasDrawnCard}
-                                   isHidden={!isCurrentPlayer} // Hide other players' hands
-                                   isHidden={!isCurrentPlayer && isSpectator} // Hide other players' hands
-                                   onDrop={handleDrop}
-                                   hitMode={hitMode}
-                                   selectedCard={selectedCard}
-                                   onCardSelect={handleCardClick}
-                                   onHit={handleHit}
-                                   onToggleHitMode={toggleHitMode}
-                                   onSpread={handleSpread}
-                                   canHit={true}
-                                   canDrop={!gameState.hasDrawnCard && isCurrentTurn && player.hitPenaltyRounds === 0}
-                                   isProcessing={false}
-                                   isLoading={false}
-                                   gameState={gameState}
-                                   isActive={hitMode}
-                                   setGameState={setGameState}
-                                   onActionComplete={(action) => {
-                                       if (action === 'DROP') handleDrop();
-                                   }}
-                                   onCardClick={handleCardClick}
-                                   playerIndex={index}
-                                   isCurrentPlayer={isCurrentPlayer}
-                                   totalPlayers={reorderedPlayers.length}
-                                   isSpectator={isSpectator}
-                                   showActions={showActions}
-                                   handScore={isCurrentPlayer ? currentPlayerHandScore : null} // Show score only for the current player
-                                   validHitSpreads={hitMode && selectedCard !== null ? reorderedSpreads.map(playerSpreads =>
-                                     playerSpreads.map(spread => isValidHit(reorderedHands[0][selectedCard], spread))
-                                   ) : []}
-                               />
-                           );
-                       })}
-
-                       <CenterGameArea
-                           className="center-area absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40vw] h-[40vw] max-w-[600px] max-h-[600px] min-w-[320px] min-h-[320px] border-6 border-accentGold rounded-full z-15"
-                           deck={gameState?.deck || []}
-                           discardPile={gameState?.discardPile || []}
-                           currentTurn={adjustedCurrentTurn}
-                           hasDrawnCard={gameState?.hasDrawnCard || false}
-                           handlePlayerAction={handlePlayerAction}
-                           isLoading={false}
-                           players={reorderedPlayers}
-                           pot={gameState?.stake * reorderedPlayers.length || 0}
-                           isSpectator={isSpectator}
-                       />
-                   </div>
-               </div>
+                    <CenterGameArea
+                        className="center-game-area"
+                        deck={gameState?.deck || []}
+                        discardPile={gameState?.discardPile || []}
+                        currentTurn={adjustedCurrentTurn}
+                        hasDrawnCard={gameState?.hasDrawnCard || false}
+                        handlePlayerAction={handlePlayerAction}
+                        isLoading={false}
+                        players={reorderedPlayers}
+                        pot={gameState?.stake * reorderedPlayers.length || 0}
+                        isSpectator={isSpectator}
+                    />
+                </div>
 
                 {gameState?.gameOver && (
                     <GameEndOverlay
