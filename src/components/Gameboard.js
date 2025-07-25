@@ -165,13 +165,19 @@ const GameBoard = ({ tableId, gameState, setGameState, user }) => {
 
         {/* Action Bar */}
         {showPlayerActions && (
-          <div className="action-bar">
-            <button onClick={() => handlePlayerAction('DRAW_CARD')}>Draw</button>
-            <button onClick={() => handlePlayerAction('DRAW_DISCARD')}>Take Discard</button>
-            <button onClick={toggleHitMode}>Hit</button>
-            <button onClick={handleDrop}>Drop</button>
-          </div>
-        )}
+  <div className="action-bar">
+    <button onClick={toggleHitMode}>Hit</button>
+    <button onClick={() => {
+      if (isValidSpread(reorderedHands[0])) {
+        socket.emit('game_action', { tableId, action: 'SPREAD', payload: { cards: reorderedHands[0] } });
+      }
+    }}>
+      Spread
+    </button>
+    <button onClick={handleDrop}>Drop</button>
+  </div>
+)}
+
 
         {/* Game Over Overlay */}
         {gameState?.gameOver && (
