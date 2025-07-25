@@ -254,7 +254,6 @@ PlayerSection.propTypes = {
     isCurrentPlayer: PropTypes.bool, // Add prop type for isCurrentPlayer
     totalPlayers: PropTypes.number, // Add prop type for totalPlayers
     isSpectator: PropTypes.bool,
-    showActions: PropTypes.bool // Only show action buttons for bottom player
     showActions: PropTypes.bool, // Only show action buttons for bottom player
     validHitSpreads: PropTypes.arrayOf(PropTypes.bool) // Add prop type for validHitSpreads
 };
