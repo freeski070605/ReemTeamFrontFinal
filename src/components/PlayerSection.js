@@ -5,6 +5,7 @@ import PlayerHand from './PlayerHand';
 import PlayerSpreads from './PlayerSpreads';
 import PlayerActions from './PlayerActions';
 import { isValidSpread, calculatePoints, findBestSpread, isValidHit } from '../utils/gameUtils';
+
 import './PlayerSection.css';
 const MemoizedPlayerHand = memo(PlayerHand);
 const MemoizedPlayerSpreads = memo(PlayerSpreads);
@@ -144,10 +145,10 @@ const PlayerSection = ({
 
     return (
         <div
-            classname=
+            className={`flex flex-col items-center justify-center p-sm rounded-md bg-darkBackground/90 shadow-sm border-1.5 border-transparent z-10 transition-all duration-300 relative
             ${isCurrentTurn ? 'border-accentGold shadow-lg animate-activePulse' : ''}
             ${penalties[position] > 0 ? 'opacity-70' : ''}
-            
+            ${className || ''}`}
         >
             {error && <div className="text-error text-sm font-bold mb-sm">{error}</div>}
 
