@@ -146,7 +146,7 @@ const PlayerSection = ({
         <div
             ${isCurrentTurn ? 'border-accentGold shadow-lg animate-activePulse' : ''}
             ${penalties[position] > 0 ? 'opacity-70' : ''}
-            `}
+            
         >
             {error && <div className="text-error text-sm font-bold mb-sm">{error}</div>}
 
